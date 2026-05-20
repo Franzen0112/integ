@@ -24,6 +24,11 @@ const SKIP_DIRS = new Set([
 
 const SKIP_EXT = new Set(['.md', '.sql', '.zip', '.example']);
 
+/** Must include image types — Vercel serves from public/ after build */
+const ASSET_EXT = new Set([
+  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.svg', '.ico'
+]);
+
 function shouldCopy(name, isDir) {
   if (SKIP_DIRS.has(name)) return false;
   if (isDir) return name === 'auth' || name === 'images' || name === 'public';
@@ -31,6 +36,7 @@ function shouldCopy(name, isDir) {
   const ext = path.extname(name).toLowerCase();
   if (SKIP_EXT.has(ext)) return false;
   if (name.startsWith('.') && name !== '.gitattributes') return false;
+  if (ASSET_EXT.has(ext)) return true;
   return (
     ext === '.html' ||
     ext === '.css' ||
@@ -74,4 +80,14 @@ for (const entry of fs.readdirSync(ROOT)) {
   copyRecursive(srcPath, path.join(PUBLIC, entry));
 }
 
-console.log('Build complete → public/');
+const imgDir = path.join(PUBLIC, 'images');
+const imgCount = fs.existsSync(imgDir)
+  ? fs.readdirSync(imgDir).filter(function(f) {
+      return fs.statSync(path.join(imgDir, f)).isFile();
+    }).length
+  : 0;
+console.log('Build complete → public/ (' + imgCount + ' images in public/images/)');
+if (imgCount === 0) {
+  console.error('ERROR: No images copied! Run: node scripts/extract-images.js then commit images/ folder.');
+  process.exit(1);
+}
