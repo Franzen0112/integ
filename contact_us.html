@@ -252,29 +252,29 @@
 
             if (result.error && window.db && window.db.createMessage) {
               result = await window.db.createMessage({ name: name, email: email, subject: subject, message: message });
-              if (!result.error) {
-                showSuccessMessage('Message sent! (Run messaging-schema.sql in Supabase for live chat.)');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                return;
-              }
             }
 
             if (result.error) {
-              showSuccessMessage('Failed: ' + result.error.message);
+              var errMsg = result.error.message || 'Unknown error';
+              if (errMsg.includes('row-level security')) {
+                errMsg += '\n\nFix: Run fix-messaging-rls.sql in Supabase SQL Editor.';
+              }
+              showSuccessMessage('Failed: ' + errMsg);
               submitBtn.innerHTML = originalText;
               submitBtn.disabled = false;
               return;
             }
 
             var thread = result.data;
-            showSuccessMessage('Message sent! You can chat with us below.');
+            showSuccessMessage('Message sent! Admin will be notified. Chat below for replies.');
             document.getElementById('contactMessage').value = '';
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
 
-            if (thread && thread.conversation_id && thread.access_token) {
-              await openContactChat(thread.conversation_id, thread.access_token);
+            var convId = thread && (thread.conversation_id || thread.conversationId);
+            var token = thread && (thread.access_token || thread.accessToken);
+            if (convId && token) {
+              await openContactChat(convId, token);
             }
 
             var urlParams = new URLSearchParams(window.location.search);

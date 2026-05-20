@@ -538,13 +538,33 @@
     try {
       const supabase = getSupabaseClient();
       if (!supabase) return { data: null, error: new Error('Supabase client not initialized') };
-      
+
+      const normalizedEmail = normalizeEmail(messageData.email);
+
+      // Prefer RPC (creates thread + admin notification)
+      try {
+        const { data: rpcData, error: rpcError } = await supabase.rpc('create_contact_thread', {
+          p_name: messageData.name,
+          p_email: normalizedEmail,
+          p_subject: messageData.subject,
+          p_body: messageData.message
+        });
+        if (!rpcError && rpcData) {
+          return { data: rpcData, error: null, viaThread: true };
+        }
+        if (rpcError && !rpcError.message.includes('does not exist')) {
+          console.warn('create_contact_thread RPC:', rpcError.message);
+        }
+      } catch (rpcErr) {
+        console.warn('RPC unavailable, trying direct insert:', rpcErr);
+      }
+
       const { data, error } = await supabase
         .from('messages')
         .insert([
           {
             name: messageData.name,
-            email: messageData.email,
+            email: normalizedEmail,
             subject: messageData.subject,
             message: messageData.message,
             read: false,

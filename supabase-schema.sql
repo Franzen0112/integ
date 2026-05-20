@@ -79,8 +79,13 @@ DROP POLICY IF EXISTS "Admins can update bookings" ON bookings;
 DROP POLICY IF EXISTS "Admins can delete bookings" ON bookings;
 
 -- Policy: Anyone can create bookings
-CREATE POLICY "Anyone can create bookings" ON bookings
-  FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon_insert_bookings" ON bookings
+  AS PERMISSIVE FOR INSERT TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "authenticated_insert_bookings" ON bookings
+  AS PERMISSIVE FOR INSERT TO authenticated
+  WITH CHECK (true);
 
 -- Policy: Anyone can read bookings (or restrict to own bookings if needed)
 CREATE POLICY "Anyone can view bookings" ON bookings
@@ -125,9 +130,14 @@ DROP POLICY IF EXISTS "Admins can view messages" ON messages;
 DROP POLICY IF EXISTS "Admins can update messages" ON messages;
 DROP POLICY IF EXISTS "Admins can delete messages" ON messages;
 
--- Policy: Anyone can create messages
-CREATE POLICY "Anyone can create messages" ON messages
-  FOR INSERT WITH CHECK (true);
+-- Policy: Anyone can create messages (anon = website visitors)
+CREATE POLICY "anon_insert_messages" ON messages
+  AS PERMISSIVE FOR INSERT TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "authenticated_insert_messages" ON messages
+  AS PERMISSIVE FOR INSERT TO authenticated
+  WITH CHECK (true);
 
 -- Policy: Only admins can read messages
 CREATE POLICY "Admins can view messages" ON messages

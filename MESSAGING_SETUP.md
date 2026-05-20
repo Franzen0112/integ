@@ -6,7 +6,8 @@ Open [SQL Editor](https://supabase.com/dashboard/project/eeagyngzbzcpqxptnqvy/sq
 
 1. `supabase-schema.sql` (if not done)
 2. `fix-rls-policies.sql`
-3. **`messaging-schema.sql`** ← required for inbox + notifications
+3. **`messaging-schema.sql`** ← inbox + notifications
+4. **`fix-messaging-rls.sql`** ← **fixes "row-level security" error on Contact form**
 
 ## 2. Enable Realtime
 
