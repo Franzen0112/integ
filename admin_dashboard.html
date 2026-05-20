@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJRK STUDIO - Admin Dashboard</title>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    .admin-header {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      padding: 20px 0;
+      margin-top: 60px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .admin-header-content {
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .admin-title {
+      color: #fff;
+      font-size: 28px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-logout {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .admin-logout:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-icon {
+      font-size: 40px;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      color: #5f687b;
+      font-size: 16px;
+    }
+
+    .bookings-section, .messages-section {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      margin-bottom: 25px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: bold;
+      border-bottom: 3px solid;
+      border-image: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%) 1;
+      padding-bottom: 15px;
+    }
+
+    .booking-card, .message-card {
+      background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+      margin-bottom: 20px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .booking-card::before, .message-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .booking-card:hover::before, .message-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .booking-card:hover, .message-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .booking-header, .message-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .booking-title, .message-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .booking-date, .message-date {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .booking-details, .message-content {
+      color: #5f687b;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .booking-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #5f687b;
+    }
+
+    .info-item i {
+      color: #667eea;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-confirmed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-completed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+  </style>
+</head>
+<body class="dashboard-bg">
+
+  <!-- Navbar -->
+  <div id="header">
+    <div class="container">
+      <h1><a href="dashboard.html" target="_self">JJRK STUDIO</a></h1>
+      <nav>
+        <ul>
+          <li><a href="dashboard.html" target="_self">Home</a></li>
+          <li><a href="about_us.html" target="_self">About</a></li>
+          <li><a href="services.html" target="_self">Services</a></li>
+          <li><a href="product.html" target="_self">Offers</a></li>
+          <li><a href="contact_us.html" target="_self">Contact</a></li>
+        </ul>
+        <div class="auth-buttons">
+          <a href="login.html" class="btn-login">LOGIN</a>
+          <a href="register.html" class="btn-signup">SIGNUP</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Admin Header -->
+  <div class="admin-header">
+    <div class="admin-header-content">
+      <div class="admin-title">
+        <i class="fa-solid fa-user-shield"></i>
+        <span>Admin Dashboard</span>
+      </div>
+      <a href="login.html" class="admin-logout" onclick="logout()">
+        <i class="fa-solid fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+
+  <main>
+    <!-- Statistics Section -->
+    <section class="featured">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="stat-number">8</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fa-solid fa-envelope"></i>
+          </div>
+          <div class="stat-number">5</div>
+          <div class="stat-label">Messages</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div class="stat-number">3</div>
+          <div class="stat-label">Pending</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fa-solid fa-check-circle"></i>
+          </div>
+          <div class="stat-number">5</div>
+          <div class="stat-label">Confirmed</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bookings Section -->
+    <section class="bookings-section">
+      <h2 class="section-title">
+        <i class="fa-solid fa-calendar-check"></i> All Bookings
+      </h2>
+      <!-- Bookings will be loaded dynamically here -->
+    </section>
+
+    <!-- Messages Section -->
+    <section class="messages-section">
+      <h2 class="section-title">
+        <i class="fa-solid fa-envelope"></i> Messages
+      </h2>
+      <!-- Messages will be loaded dynamically here -->
+    </section>
+  </main>
+
+  <footer style="padding:40px 20px; background:#f5f5f5; position:relative; color:#000000;">
+    <div style="text-align:center;">
+      <h3 style="color:#000000; margin:10px 0;">JJRK STUDIO</h3>
+      <p style="color:#000000; margin-bottom:25px;">Professional Photography & Videography Services</p>
+    </div>
+  
+    <p style="text-align:center; margin-top:20px; color:#000000;">&copy; <strong>JJRK STUDIO</strong>. All Rights Reserved</p>
+    
+    <!-- Social Media Icons - Centered at Bottom -->
+    <div class="social-links" style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:25px;">
+      <a href="https://www.facebook.com/profile.php?id=61579946364411&rdid=nj9z6stpJY6dPKt3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CeQP8tiQc#" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="Facebook">
+        <i class="fa-brands fa-facebook"></i>
+      </a>
+      <a href="https://www.instagram.com/jjrkstudio?igsh=MThxcGJ2bHA0emxyMw%3D%3D" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="Instagram">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/jjrk-studio-13b7b2399" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="LinkedIn">
+        <i class="fa-brands fa-linkedin"></i>
+      </a>
+      <a href="https://www.tiktok.com/@jjrkstudio?is_from_webapp=1&sender_device=pc" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="TikTok">
+        <i class="fa-brands fa-tiktok"></i>
+      </a>
+      <a href="mailto:jjrkstudio@gmail.com" style="color:#667eea; text-decoration:none; font-size:20px;" title="Email">
+        <i class="fa-solid fa-envelope"></i>
+      </a>
+    </div>
+  </footer>
+  
+  <!-- JavaScript File -->
+  <script src="script.js"></script>
+  
+  <script>
+    // Variables to store data
+    let bookingsData = [];
+    let messagesData = [];
+
+    // Format date
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // Load and display bookings from Supabase
+    async function loadBookings() {
+      try {
+        const result = await window.db.getAllBookings();
+        
+        if (result.error) {
+          console.error('Error loading bookings:', result.error);
+          alert('Error loading bookings: ' + result.error.message);
+          return;
+        }
+
+        bookingsData = result.data || [];
+        const bookings = bookingsData;
+        const bookingsContainer = document.querySelector('.bookings-section');
+        
+        if (!bookingsContainer) return;
+        
+        // Clear existing bookings (except title)
+        const title = bookingsContainer.querySelector('.section-title');
+        bookingsContainer.innerHTML = '';
+        if (title) bookingsContainer.appendChild(title);
+        
+        const bookingsList = document.createElement('div');
+        bookingsList.className = 'bookings-list';
+        
+        if (bookings.length === 0) {
+          bookingsList.innerHTML = '<p style="text-align:center; color:#5f687b; padding:40px;">No bookings yet.</p>';
+          bookingsContainer.appendChild(bookingsList);
+          updateStatistics();
+          return;
+        }
+        
+        bookings.forEach(booking => {
+        const card = document.createElement('div');
+        card.className = 'booking-card';
+        
+        const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
+                           booking.status === 'cancelled' ? 'status-pending' : 'status-pending';
+        
+        const bookingDate = booking.date ? formatDate(booking.date) : 'N/A';
+        card.innerHTML = `
+          <div class="booking-header">
+            <div class="booking-title">${booking.service}</div>
+            <div class="booking-date"><i class="fa-solid fa-calendar"></i> ${bookingDate}</div>
+          </div>
+          <div class="booking-details">
+            <strong>Client:</strong> ${booking.client}<br>
+            <strong>Email:</strong> ${booking.email}<br>
+            <strong>Phone:</strong> ${booking.phone}
+          </div>
+          <div class="booking-info">
+            <div class="info-item">
+              <i class="fa-solid fa-map-marker-alt"></i>
+              <span>${booking.location}</span>
+            </div>
+            <div class="info-item">
+              <i class="fa-solid fa-clock"></i>
+              <span>${booking.time}</span>
+            </div>
+            <div class="info-item">
+              <i class="fa-solid fa-users"></i>
+              <span>${booking.guests} guests</span>
+            </div>
+          </div>
+          <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+            <span class="status-badge ${statusClass}">${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}</span>
+            <button onclick="updateBookingStatus(${booking.id}, 'confirmed')" class="status-btn" style="padding: 6px 12px; border: none; border-radius: 20px; background: #d1fae5; color: #065f46; cursor: pointer; font-size: 12px; font-weight: bold;">Confirm</button>
+            <button onclick="updateBookingStatus(${booking.id}, 'cancelled')" class="status-btn" style="padding: 6px 12px; border: none; border-radius: 20px; background: #fee2e2; color: #991b1b; cursor: pointer; font-size: 12px; font-weight: bold;">Cancel</button>
+            <button onclick="deleteBooking(${booking.id})" class="status-btn" style="padding: 6px 12px; border: none; border-radius: 20px; background: #fee2e2; color: #991b1b; cursor: pointer; font-size: 12px; font-weight: bold;">Delete</button>
+          </div>
+        `;
+        bookingsList.appendChild(card);
+      });
+      
+      bookingsContainer.appendChild(bookingsList);
+      updateStatistics();
+    } catch (error) {
+      console.error('Error in loadBookings:', error);
+    }
+    }
+
+    // Load and display messages from Supabase
+    async function loadMessages() {
+      try {
+        const result = await window.db.getAllMessages();
+        
+        if (result.error) {
+          console.error('Error loading messages:', result.error);
+          alert('Error loading messages: ' + result.error.message);
+          return;
+        }
+
+        messagesData = result.data || [];
+        const messages = messagesData;
+        const messagesContainer = document.querySelector('.messages-section');
+        
+        if (!messagesContainer) return;
+        
+        // Clear existing messages (except title)
+        const title = messagesContainer.querySelector('.section-title');
+        messagesContainer.innerHTML = '';
+        if (title) messagesContainer.appendChild(title);
+        
+        const messagesList = document.createElement('div');
+        messagesList.className = 'messages-list';
+        
+        if (messages.length === 0) {
+          messagesList.innerHTML = '<p style="text-align:center; color:#5f687b; padding:40px;">No messages yet.</p>';
+          messagesContainer.appendChild(messagesList);
+          updateStatistics();
+          return;
+        }
+        
+        messages.forEach(msg => {
+        const card = document.createElement('div');
+        card.className = 'message-card';
+        if (!msg.read) {
+          card.style.borderLeft = '4px solid #667eea';
+        }
+        
+        const messageDate = msg.created_at ? formatDate(msg.created_at) : 'N/A';
+        card.innerHTML = `
+          <div class="message-header">
+            <div class="message-title">${msg.subject}</div>
+            <div class="message-date"><i class="fa-solid fa-calendar"></i> ${messageDate}</div>
+          </div>
+          <div class="message-content">
+            <strong>From:</strong> ${msg.name} (${msg.email})<br>
+            <strong>Subject:</strong> ${msg.subject}<br><br>
+            ${msg.message}
+          </div>
+          <div style="margin-top: 15px;">
+            ${!msg.read ? '<button onclick="markAsRead(' + msg.id + ')" class="status-btn" style="padding: 6px 12px; border: none; border-radius: 20px; background: #667eea; color: #fff; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 10px;">Mark as Read</button>' : ''}
+            <button onclick="deleteMessage(${msg.id})" class="status-btn" style="padding: 6px 12px; border: none; border-radius: 20px; background: #fee2e2; color: #991b1b; cursor: pointer; font-size: 12px; font-weight: bold;">Delete</button>
+          </div>
+        `;
+        messagesList.appendChild(card);
+      });
+      
+      messagesContainer.appendChild(messagesList);
+      updateStatistics();
+    } catch (error) {
+      console.error('Error in loadMessages:', error);
+    }
+    }
+
+    // Update statistics
+    function updateStatistics() {
+      const totalBookings = bookingsData.length;
+      const totalMessages = messagesData.length;
+      const pendingBookings = bookingsData.filter(b => b.status === 'pending').length;
+      const confirmedBookings = bookingsData.filter(b => b.status === 'confirmed').length;
+      
+      // Update stat numbers
+      const statNumbers = document.querySelectorAll('.stat-number');
+      if (statNumbers.length >= 4) {
+        statNumbers[0].textContent = totalBookings;
+        statNumbers[1].textContent = totalMessages;
+        statNumbers[2].textContent = pendingBookings;
+        statNumbers[3].textContent = confirmedBookings;
+      }
+    }
+
+    // Update booking status in Supabase
+    async function updateBookingStatus(id, status) {
+      try {
+        const result = await window.db.updateBookingStatus(id, status);
+        
+        if (result.error) {
+          alert('Error updating booking: ' + result.error.message);
+          return;
+        }
+
+        await loadBookings();
+      } catch (error) {
+        console.error('Error updating booking status:', error);
+        alert('An error occurred while updating the booking.');
+      }
+    }
+
+    // Delete booking from Supabase
+    async function deleteBooking(id) {
+      if (confirm('Are you sure you want to delete this booking?')) {
+        try {
+          const result = await window.db.deleteBooking(id);
+          
+          if (result.error) {
+            alert('Error deleting booking: ' + result.error.message);
+            return;
+          }
+
+          await loadBookings();
+        } catch (error) {
+          console.error('Error deleting booking:', error);
+          alert('An error occurred while deleting the booking.');
+        }
+      }
+    }
+
+    // Mark message as read in Supabase
+    async function markAsRead(id) {
+      try {
+        const result = await window.db.markMessageAsRead(id);
+        
+        if (result.error) {
+          alert('Error marking message as read: ' + result.error.message);
+          return;
+        }
+
+        await loadMessages();
+      } catch (error) {
+        console.error('Error marking message as read:', error);
+        alert('An error occurred while updating the message.');
+      }
+    }
+
+    // Delete message from Supabase
+    async function deleteMessage(id) {
+      if (confirm('Are you sure you want to delete this message?')) {
+        try {
+          const result = await window.db.deleteMessage(id);
+          
+          if (result.error) {
+            alert('Error deleting message: ' + result.error.message);
+            return;
+          }
+
+          await loadMessages();
+        } catch (error) {
+          console.error('Error deleting message:', error);
+          alert('An error occurred while deleting the message.');
+        }
+      }
+    }
+
+    // Check if admin is logged in and load dashboard
+    window.addEventListener('DOMContentLoaded', async function() {
+      console.log('Admin Dashboard: Checking access...');
+      const isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn');
+      const userId = sessionStorage.getItem('userId');
+      
+      console.log('Admin Dashboard: Session check', {
+        isAdminLoggedIn,
+        userId,
+        adminLoggedInValue: isAdminLoggedIn === 'true'
+      });
+
+      if (!isAdminLoggedIn || isAdminLoggedIn !== 'true' || !userId) {
+        console.log('Admin Dashboard: Access denied - missing session data');
+        alert('Access denied. Please login as admin.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Verify user is actually admin in Supabase
+      try {
+        console.log('Admin Dashboard: Verifying admin status for user:', userId);
+        const adminCheck = await window.db.isAdmin(userId);
+        console.log('Admin Dashboard: Admin check result:', adminCheck);
+        
+        if (!adminCheck) {
+          console.log('Admin Dashboard: Access denied - not admin in database');
+          alert('Access denied. Admin privileges required. Your role in database might not be set to 1 (admin).');
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        console.log('Admin Dashboard: Access granted, loading data...');
+        // Load dashboard data
+        await loadBookings();
+        await loadMessages();
+      } catch (error) {
+        console.error('Admin Dashboard: Error checking admin status:', error);
+        alert('An error occurred. Please try logging in again.');
+        window.location.href = 'login.html';
+      }
+    });
+
+    async function logout() {
+      await window.db.logoutUser();
+      sessionStorage.removeItem('adminLoggedIn');
+      sessionStorage.removeItem('userId');
+      window.location.href = 'login.html';
+    }
+  </script>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Configuration -->
+  <script src="supabase-config.js"></script>
+  <!-- Database Utility Functions -->
+  <script src="db.js"></script>
+  
+</body>
+</html>
+

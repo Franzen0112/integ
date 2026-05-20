@@ -1,0 +1,685 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJRKSTUDIO - Special Offers</title>
+  
+    <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* --- 1. THEME VARIABLES --- */
+    :root {
+      --primary-color: #667eea; 
+      --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --bg-light: #f8f9ff;
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --card-radius: 25px;
+      --pill-radius: 50px;
+    }
+
+    /* --- 2. GLOBAL & LAYOUT --- */
+    html {
+      background-color: #e8e8e8 !important;
+      background: #e8e8e8 !important;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e8e8e8 !important;
+      background: #e8e8e8 !important;
+      background-image: none !important;
+      background-size: auto !important;
+      animation: none !important;
+      color: #333;
+      overflow-x: auto;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    main {
+      padding-top: 60px;
+      background-color: #f5f5f5;
+      padding-bottom: 60px;
+    }
+
+    /* --- 3. NAVIGATION (Pill Style) --- */
+    #header {
+      background: linear-gradient(135deg, rgba(51, 51, 51, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      height: 60px;
+    }
+    #header .container {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      height: 60px;
+      box-sizing: border-box;
+    }
+    #header h1 {
+      font-size: 24px;
+      margin: 0;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: bold;
+      height: auto;
+    }
+    #header h1 a {
+      text-decoration: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.3s ease;
+    }
+    #header nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 100%;
+      min-height: 32px;
+    }
+    #header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+      height: 100%;
+    }
+    #header nav a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 10px 18px;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    #header nav a:hover {
+      background: rgba(102, 126, 234, 0.2);
+      color: #fff;
+      transform: translateY(-2px);
+      border: 1px solid rgba(102, 126, 234, 0.5);
+    }
+    #header nav a.active {
+      background: rgba(102, 126, 234, 0.3);
+      color: #fff;
+      border: 1px solid rgba(102, 126, 234, 0.6);
+    }
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      height: 100%;
+      flex-shrink: 0;
+    }
+    .btn-login, .btn-signup {
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .btn-login {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .btn-login:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.5);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .btn-signup {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+    .btn-signup:hover {
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* --- 4. SECTIONS & TITLES --- */
+    .breadcrumbs { 
+      padding: 50px 0 20px; 
+      text-align: center;
+      background: rgba(255, 255, 255, 0.95);
+      position: relative;
+    }
+    .breadcrumbs::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    }
+    .breadcrumbs h2 { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 36px; 
+      margin: 0; 
+      font-weight: bold;
+      animation: slideIn 0.8s ease-out;
+    }
+
+    .category-row {
+      margin-top: 50px;
+      padding-bottom: 12px;
+      margin-bottom: 35px;
+      position: relative;
+    }
+    .category-row::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 1000px;
+      height: 1.5px;
+      background: linear-gradient(to right, #764ba2 0%, #a29bfe 40%, rgba(162, 155, 254, 0.5) 70%, rgba(162, 155, 254, 0) 100%);
+    }
+    .category-row h2 { 
+      color: #2196F3;
+      margin: 0; 
+      font-size: 28px; 
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* --- 5. PRODUCT CARDS (High Rounding) --- */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 35px;
+      margin-bottom: 60px;
+    }
+
+    .product-card {
+      background: #ffffff;
+      border-radius: var(--card-radius);
+      padding: 35px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+    .product-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .product-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 18px;
+      margin-bottom: 25px;
+    }
+    .product-card h3 { 
+      color: #2196F3; 
+      margin-bottom: 12px; 
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .product-card p { 
+      color: #666; 
+      font-size: 15px; 
+      margin-bottom: 30px; 
+      padding: 0 10px;
+      line-height: 1.6;
+    }
+    
+    .product-card button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: var(--pill-radius);
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    .product-card button:hover::before {
+      left: 100%;
+    }
+    .product-card button:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    /* --- 6. GLASSMORPHISM BOOKING MODAL --- */
+    .booking-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+    }
+    .booking-modal.active { display: flex; }
+
+    .booking-modal-overlay {
+      position: absolute; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+    }
+
+    .booking-modal-content {
+      position: relative;
+      background: var(--glass-bg);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid var(--glass-border);
+      border-radius: 35px;
+      padding: 45px;
+      width: 90%;
+      max-width: 800px;
+      color: white;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+      animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes modalPop {
+      from { transform: translateY(60px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .booking-modal-title {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 5px;
+      font-weight: 800;
+      background: linear-gradient(to right, #ffffff, #dcd0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .booking-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .full-width { grid-column: 1 / -1; }
+
+    .booking-form-group label { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px;
+      margin-bottom: 10px; 
+      font-size: 14px; 
+      color: #efefef;
+      font-weight: 500;
+    }
+    .booking-form-group input {
+      width: 100%;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      color: white;
+      box-sizing: border-box;
+      outline: none;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    .booking-form-group input:focus { 
+      border-color: var(--primary-color); 
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(125, 137, 240, 0.3);
+    }
+
+    .booking-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .booking-btn-submit {
+      background: var(--accent-gradient);
+      border: none; color: white; padding: 15px 40px; border-radius: var(--pill-radius);
+      font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    .booking-btn-cancel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border); color: white; padding: 15px 40px; border-radius: var(--pill-radius);
+      cursor: pointer; transition: 0.3s;
+    }
+
+    /* Footer override to match services.html */
+    footer {
+      padding: 40px 20px !important;
+      background: #f5f5f5 !important;
+      color: #000000 !important;
+    }
+    footer h3 {
+      color: #000000 !important;
+      margin: 10px 0 !important;
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      -webkit-text-fill-color: #000000 !important;
+      background-clip: unset !important;
+      font-size: inherit !important;
+    }
+    footer p {
+      color: #000000 !important;
+      margin: 0 !important;
+    }
+    footer::before {
+      content: '' !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      height: 3px !important;
+      background: linear-gradient(to right, #667eea, #764ba2) !important;
+      display: block !important;
+    }
+    .social-links a {
+      color: #667eea !important;
+      background: transparent !important;
+      width: auto !important;
+      height: auto !important;
+      line-height: normal !important;
+      font-size: 20px !important;
+    }
+
+    @media (max-width: 768px) {
+      .category-row::after {
+        width: 90%;
+      }
+    }
+
+  </style>
+  </head>
+  <body>
+
+    <div id="header">
+      <div class="container">
+      <h1><a href="index.html" target="_self">JJRKSTUDIO</a></h1>
+        <nav>
+          <ul>
+          <li><a href="index.html" target="_self">Home</a></li>
+            <li><a href="about_us.html" target="_self">About</a></li>
+            <li><a href="services.html" target="_self">Services</a></li>
+          <li><a href="product.html" target="_self" class="active">Offers</a></li>
+            <li><a href="contact_us.html" target="_self">Contact</a></li>
+          </ul>
+          <div class="auth-buttons">
+            <a href="login.html" class="btn-login">LOGIN</a>
+            <a href="register.html" class="btn-signup">SIGNUP</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <main>
+      <section class="breadcrumbs">
+        <div class="container">
+          <h2>Special Offers</h2>
+        </div>
+      </section>
+
+        <div class="container">
+      <div class="category-row">
+        <h2><i class="fa-solid fa-ring"></i> Wedding Packages</h2>
+          </div>
+    <div class="product-grid">
+          <div class="product-card">
+        <img src="images/wedding.jpg" alt="Wedding Basic">
+            <h3>Wedding Package Basic</h3>
+            <p>Essential photo & video coverage for your wedding day.</p>
+            <button onclick="bookNow('Wedding Package Basic')">Book Now</button>
+          </div>
+          <div class="product-card">
+        <img src="images/family portraits.png" alt="Wedding Premium">
+            <h3>Wedding Package Premium</h3>
+            <p>Comprehensive photo & video coverage with premium features.</p>
+            <button onclick="bookNow('Wedding Package Premium')">Book Now</button>
+          </div>
+          </div>
+          
+    <div class="category-row">
+      <h2><i class="fa-solid fa-calendar-check"></i> Event Packages</h2>
+    </div>
+    <div class="product-grid">
+          <div class="product-card">
+        <img src="images/Event Coverage Standard.jpg" alt="Event Standard">
+            <h3>Event Coverage Standard</h3>
+            <p>High-quality photography & videography for special occasions.</p>
+            <button onclick="bookNow('Event Coverage Standard')">Book Now</button>
+          </div>
+          <div class="product-card">
+        <img src="images/Event Coverage Premium.avif" alt="Event Premium">
+            <h3>Event Coverage Premium</h3>
+            <p>Premium event coverage with extended hours and multiple cameras.</p>
+            <button onclick="bookNow('Event Coverage Premium')">Book Now</button>
+          </div>
+          </div>
+          
+    <div class="category-row">
+      <h2><i class="fa-solid fa-camera-retro"></i> Photo Booth Rental</h2>
+    </div>
+    <div class="product-grid">
+          <div class="product-card">
+            <img src="images/Photo Booth.jpg" alt="Photo Booth Basic">
+            <h3>Photo Booth Basic</h3>
+            <p>Fun and interactive photo booth setup for your parties.</p>
+            <button onclick="bookNow('Photo Booth Basic')">Book Now</button>
+          </div>
+          <div class="product-card">
+            <img src="images/Photo Booth Deluxe.jpg" alt="Photo Booth Deluxe">
+            <h3>Photo Booth Deluxe</h3>
+            <p>Premium photo booth with props and custom backgrounds.</p>
+            <button onclick="bookNow('Photo Booth Deluxe')">Book Now</button>
+          </div>
+        </div>
+    </div>
+  </main>
+      
+      <div id="bookingModal" class="booking-modal">
+        <div class="booking-modal-overlay" onclick="closeBookingModal()"></div>
+        <div class="booking-modal-content">
+          <h2 class="booking-modal-title">Book Your Service</h2>
+          <p id="bookingServiceName" style="text-align: center; color: #b388ff; font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;"></p>
+          
+          <form id="bookingForm" onsubmit="submitBooking(event)">
+            <div class="booking-form-grid">
+              <div class="booking-form-group">
+                <label><i class="fa-solid fa-user"></i> Full Name</label>
+                <input type="text" name="name" placeholder="John Doe" required>
+              </div>
+              <div class="booking-form-group">
+                <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" name="email" placeholder="john@example.com" required>
+              </div>
+              <div class="booking-form-group">
+                <label><i class="fa-solid fa-phone"></i> Phone Number</label>
+                <input type="tel" name="phone" placeholder="0912 345 6789" required>
+              </div>
+              <div class="booking-form-group">
+                <label><i class="fa-solid fa-calendar-days"></i> Event Date</label>
+                <input type="date" id="bookingDate" name="date" required>
+              </div>
+              <div class="booking-form-group">
+                <label><i class="fa-solid fa-clock"></i> Event Time</label>
+                <input type="text" name="time" placeholder="e.g., 8:00 AM - 5:00 PM" required>
+              </div>
+              <div class="booking-form-group">
+                <label><i class="fa-solid fa-users"></i> No. of Guests</label>
+                <input type="number" name="guests" min="1" placeholder="100" required>
+              </div>
+              <div class="booking-form-group full-width">
+                <label><i class="fa-solid fa-location-dot"></i> Event Location</label>
+                <input type="text" name="location" placeholder="Hotel, Convention Center, etc." required>
+              </div>
+            </div>
+
+            <div class="booking-form-actions">
+              <button type="button" class="booking-btn-cancel" onclick="closeBookingModal()">Cancel</button>
+              <button type="submit" class="booking-btn-submit" id="submitBtn">Submit Booking Request</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+  <footer style="padding:40px 20px; background:#f5f5f5; position:relative; color:#000000;">
+    <div style="text-align:center;">
+      <h3 style="color:#000000; margin:10px 0;">JJRK STUDIO</h3>
+      <p style="color:#000000; margin-bottom:25px;">Professional Photography & Videography Services</p>
+    </div>
+  
+    <p style="text-align:center; margin-top:20px; color:#000000;">&copy; <strong>JJRK STUDIO</strong>. All Rights Reserved</p>
+    
+    <!-- Social Media Icons - Centered at Bottom -->
+    <div class="social-links" style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:25px;">
+      <a href="https://www.facebook.com/profile.php?id=61579946364411&rdid=nj9z6stpJY6dPKt3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CeQP8tiQc#" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="Facebook">
+        <i class="fa-brands fa-facebook"></i>
+      </a>
+      <a href="https://www.instagram.com/jjrkstudio?igsh=MThxcGJ2bHA0emxyMw%3D%3D" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="Instagram">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/jjrk-studio-13b7b2399" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="LinkedIn">
+        <i class="fa-brands fa-linkedin"></i>
+      </a>
+      <a href="https://www.tiktok.com/@jjrkstudio?is_from_webapp=1&sender_device=pc" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="TikTok">
+        <i class="fa-brands fa-tiktok"></i>
+      </a>
+      <a href="mailto:jjrkstudio@gmail.com" style="color:#667eea; text-decoration:none; font-size:20px;" title="Email">
+        <i class="fa-solid fa-envelope"></i>
+      </a>
+    </div>
+  </footer>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+      <script>
+      let currentProductName = '';
+
+      function bookNow(productName) {
+        currentProductName = productName;
+        document.getElementById('bookingServiceName').textContent = productName;
+        document.getElementById('bookingModal').classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('bookingDate').setAttribute('min', today);
+      }
+
+      function closeBookingModal() {
+        document.getElementById('bookingModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+
+      async function submitBooking(event) {
+        event.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const originalText = btn.innerHTML;
+        
+        const formData = new FormData(event.target);
+        const bookingData = {
+          service: currentProductName,
+          client: formData.get('name'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          date: formData.get('date'),
+          time: formData.get('time'),
+          location: formData.get('location'),
+          guests: formData.get('guests'),
+          status: 'pending'
+        };
+
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        try {
+          if (!window.db || !window.db.createBooking) {
+             throw new Error("Database configuration missing.");
+          }
+
+          const result = await window.db.createBooking(bookingData);
+          if (result.error) throw result.error;
+
+          alert('Booking Successful! We will contact you shortly.');
+          closeBookingModal();
+          window.location.href = 'contact_us.html?ref=booking';
+        } catch (error) {
+          alert('Booking Error: ' + error.message);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+
+      // Close on Escape key
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeBookingModal();
+      });
+      </script>
+
+      <!-- Supabase JS Library -->
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <!-- Supabase Configuration -->
+      <script src="supabase-config.js"></script>
+      <!-- Database Utility Functions -->
+      <script src="db.js"></script>
+    <!-- Navigation Authentication Handler -->
+    <script src="nav-auth.js"></script>
+
+  </body>
+  </html>

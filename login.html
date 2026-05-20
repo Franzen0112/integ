@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJRK STUDIO - Login</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('images/camera.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 450px;
+      padding: 20px;
+    }
+
+    .login-form {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .login-form:hover {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(-5px);
+    }
+
+    .login-form h1 {
+      text-align: center;
+      color: #fff;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .password-toggle:hover {
+      color: #fff;
+      transform: translateY(-50%) scale(1.2);
+    }
+
+    .password-toggle:active {
+      transform: translateY(-50%) scale(1);
+    }
+
+    .form-group label {
+      display: block;
+      color: #fff;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .password-wrapper input {
+      padding-right: 40px;
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+      transition: color 0.3s ease;
+    }
+
+    .form-group input:hover {
+      border-bottom-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-group input:hover::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-group input:focus {
+      border-bottom-color: #fff;
+      border-bottom-width: 3px;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .remember-me:hover {
+      opacity: 0.9;
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+      cursor: pointer;
+      transform: scale(1);
+      transition: transform 0.2s ease;
+    }
+
+    .remember-me:hover input[type="checkbox"] {
+      transform: scale(1.1);
+    }
+
+    .forgot-password {
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .forgot-password:hover {
+      opacity: 0.9;
+      text-decoration: underline;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-3px);
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 15px;
+      background: #fff;
+      color: #333;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(102, 126, 234, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .login-button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .login-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
+      background: #f8f9ff;
+    }
+
+    .login-button:active {
+      transform: translateY(-1px);
+    }
+
+    .login-button span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .register-link {
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .register-link a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    .register-link a:hover {
+      opacity: 0.9;
+      text-decoration: underline;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    @media(max-width: 500px) {
+      .login-form {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-form">
+      <a href="dashboard.html" style="display: inline-flex; align-items: center; color: #fff; text-decoration: none; margin-bottom: 20px; font-size: 14px; transition: all 0.3s ease; padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.1);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.transform='translateX(-3px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.transform='translateX(0)'">
+        <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
+        <span>Back to Dashboard</span>
+      </a>
+      <h1><i class="fa-solid fa-sign-in-alt" style="margin-right: 12px;"></i>Login</h1>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Enter your email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Enter your password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" checked>
+            Remember me
+          </label>
+          <a href="#" class="forgot-password">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="login-button"><span>Log In</span></button>
+      </form>
+
+      <div class="register-link">
+        Don't have an account? <a href="register.html">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // Toggle eye icon
+      if (type === 'password') {
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+      } else {
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+      }
+    });
+
+    // Supabase authentication
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        // Login with Supabase
+        const result = await window.db.loginUser(email, password);
+
+        if (result.error) {
+          alert('Login failed: ' + result.error.message);
+          return;
+        }
+
+        if (result.data && result.data.user) {
+          // Check if user is admin
+          const userId = result.data.user.id;
+          const userEmail = result.data.user.email;
+          
+          console.log('=== LOGIN DEBUG INFO ===');
+          console.log('User ID:', userId);
+          console.log('User Email:', userEmail);
+          console.log('Checking admin status...');
+          
+          const adminCheck = await window.db.isAdmin(userId);
+          
+          console.log('=== ADMIN CHECK RESULT ===');
+          console.log('Admin check returned:', adminCheck);
+          console.log('Type:', typeof adminCheck);
+          
+          if (adminCheck === true) {
+            console.log('✅ User is ADMIN - Setting session and redirecting...');
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('userId', userId);
+            sessionStorage.setItem('userEmail', userEmail);
+            
+            // Force redirect
+            console.log('Redirecting to admin_dashboard.html...');
+            window.location.replace('admin_dashboard.html');
+          } else {
+            console.log('❌ User is NOT admin - Redirecting to regular dashboard');
+            console.log('Admin check value:', adminCheck);
+            sessionStorage.setItem('userLoggedIn', 'true');
+            sessionStorage.setItem('userId', userId);
+            sessionStorage.setItem('userEmail', userEmail);
+            alert('Login successful! Redirecting to dashboard...');
+            window.location.href = 'dashboard.html';
+          }
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        console.error('Full error details:', error);
+        alert('An error occurred during login. Please check console for details.');
+      }
+    });
+    
+    // Test function to verify admin status (can be called from console)
+    window.testAdminStatus = async function(email) {
+      console.log('=== TESTING ADMIN STATUS ===');
+      if (!window.db) {
+        console.error('Database functions not loaded!');
+        return;
+      }
+      
+      try {
+        // Get user by email from Supabase
+        const supabase = window.supabaseClient;
+        if (!supabase) {
+          console.error('Supabase client not available');
+          return;
+        }
+        
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, email, role')
+          .eq('email', email)
+          .single();
+          
+        console.log('User data from database:', userData);
+        console.log('User error:', userError);
+        
+        if (userData) {
+          console.log('User found:', {
+            id: userData.id,
+            email: userData.email,
+            role: userData.role,
+            roleType: typeof userData.role,
+            isAdmin: userData.role === 1 || userData.role === '1'
+          });
+          
+          // Test isAdmin function
+          const adminCheck = await window.db.isAdmin(userData.id);
+          console.log('isAdmin function result:', adminCheck);
+        }
+      } catch (error) {
+        console.error('Test error:', error);
+      }
+    };
+  </script>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Configuration -->
+  <script src="supabase-config.js"></script>
+  <!-- Database Utility Functions -->
+  <script src="db.js"></script>
+</body>
+</html>
+
