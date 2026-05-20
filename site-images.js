@@ -1,57 +1,76 @@
 /**
- * Site images: local images/ folder (extracted zip) + optional Supabase override
+ * Public site images — every file in /images + Supabase site_images (anon can read)
  */
 (function() {
   'use strict';
 
   var BUCKET = 'jjrk-images';
 
-  /** Local paths after extracting images-*.zip into project root /images */
-  var IMAGE_FALLBACKS = {
-    studio_main: 'images/jjrk.png',
-    product_wedding_basic: 'images/wedding.jpg',
-    product_wedding_premium: 'images/family portraits.png',
-    product_event_standard: 'images/Event Coverage Standard.jpg',
-    product_event_premium: 'images/Event Coverage Premium.avif',
-    product_photobooth_basic: 'images/Photo Booth.jpg',
-    product_photobooth_deluxe: 'images/Photo Booth Deluxe.jpg',
-    service_wedding: 'images/wedding.jpg',
-    service_event: 'images/Event Videography.png',
-    service_photobooth: 'images/Photo Booth.jpg'
-  };
-
-  var FALLBACK_CATALOG = [
+  /** Every image in images/ folder — public fallback_path for Vercel + local */
+  var PUBLIC_IMAGE_CATALOG = [
     { slug: 'team_ronie', category: 'team', title: 'Ronie Manaongsong', subtitle: 'CEO & Founder',
-      description: 'Ronie leads JJRK Studio with a clear vision for quality and client satisfaction.', sort_order: 1 },
+      description: 'Ronie leads JJRK Studio with vision and client-focused leadership.', sort_order: 1,
+      fallback_path: 'images/Rovick Polinar.png' },
     { slug: 'team_kim', category: 'team', title: 'Kim Duenas', subtitle: 'Lead Photographer',
-      description: 'Kim specializes in capturing authentic moments with sharp composition and natural lighting.', sort_order: 2 },
+      description: 'Kim captures authentic moments with sharp composition and natural light.', sort_order: 2,
+      fallback_path: 'images/Christian Kirt Basog.jpg' },
     { slug: 'team_drowmar', category: 'team', title: 'Drowmar Vincullado', subtitle: 'Lead Videographer',
-      description: 'Drowmar creates cinematic video content with smooth motion and strong storytelling.', sort_order: 3 },
+      description: 'Drowmar creates cinematic stories for weddings and events.', sort_order: 3,
+      fallback_path: 'images/Jhon Vaneth Mejos.jpg' },
     { slug: 'team_franzen', category: 'team', title: 'Franzen Libradilla', subtitle: 'Media & Web Specialist',
-      description: 'Franzen supports the studio\'s digital side—website, booking, and media systems.', sort_order: 4 },
+      description: 'Franzen manages the studio website and digital experience.', sort_order: 4,
+      fallback_path: 'images/Jason S. Salim.jpg' },
     { slug: 'team_dec', category: 'team', title: 'Dec Bucong', subtitle: 'Senior Photo & Video Editor',
-      description: 'Dec brings photos and footage to life through color grading and precise cuts.', sort_order: 5 },
+      description: 'Dec delivers polished photos and videos through expert editing.', sort_order: 5,
+      fallback_path: 'images/Video Editing.webp' },
     { slug: 'product_wedding_basic', category: 'product', title: 'Wedding Package Basic', subtitle: 'Wedding Packages',
-      description: 'Essential photo & video coverage for your wedding day.', sort_order: 10 },
+      description: 'Essential photo & video coverage for your wedding day.', sort_order: 10,
+      fallback_path: 'images/wedding.jpg' },
     { slug: 'product_wedding_premium', category: 'product', title: 'Wedding Package Premium', subtitle: 'Wedding Packages',
-      description: 'Comprehensive photo & video coverage with premium features.', sort_order: 11 },
+      description: 'Comprehensive photo & video coverage with premium features.', sort_order: 11,
+      fallback_path: 'images/family portraits.png' },
     { slug: 'product_event_standard', category: 'product', title: 'Event Coverage Standard', subtitle: 'Event Packages',
-      description: 'High-quality photography & videography for special occasions.', sort_order: 20 },
+      description: 'High-quality photography & videography for special occasions.', sort_order: 20,
+      fallback_path: 'images/Event Coverage Standard.jpg' },
     { slug: 'product_event_premium', category: 'product', title: 'Event Coverage Premium', subtitle: 'Event Packages',
-      description: 'Premium event coverage with extended hours and multiple cameras.', sort_order: 21 },
+      description: 'Premium event coverage with extended hours and multiple cameras.', sort_order: 21,
+      fallback_path: 'images/Event Coverage Premium.avif' },
     { slug: 'product_photobooth_basic', category: 'product', title: 'Photo Booth Basic', subtitle: 'Photo Booth Rental',
-      description: 'Fun and interactive photo booth setup for your parties.', sort_order: 30 },
+      description: 'Fun and interactive photo booth setup for your parties.', sort_order: 30,
+      fallback_path: 'images/Photo Booth.jpg' },
     { slug: 'product_photobooth_deluxe', category: 'product', title: 'Photo Booth Deluxe', subtitle: 'Photo Booth Rental',
-      description: 'Premium photo booth with props and custom backgrounds.', sort_order: 31 },
+      description: 'Premium photo booth with props and custom backgrounds.', sort_order: 31,
+      fallback_path: 'images/Photo Booth Deluxe.jpg' },
     { slug: 'service_wedding', category: 'service', title: 'Wedding Photography', subtitle: 'Services',
-      description: 'Professional wedding photography services.', sort_order: 40 },
+      description: 'Professional wedding photography services.', sort_order: 40,
+      fallback_path: 'images/wedding.jpg' },
     { slug: 'service_event', category: 'service', title: 'Event Videography', subtitle: null,
-      description: 'Professional videography for celebrations.', sort_order: 41 },
+      description: 'Professional videography for celebrations.', sort_order: 41,
+      fallback_path: 'images/Event Videography.png' },
     { slug: 'service_photobooth', category: 'service', title: 'Photo Booth Rental', subtitle: null,
-      description: 'Photo booth rental for events.', sort_order: 42 },
+      description: 'Photo booth rental for events.', sort_order: 42,
+      fallback_path: 'images/Photo Booth.jpg' },
+    { slug: 'service_portraits', category: 'service', title: 'Studio Portraits', subtitle: null,
+      description: 'Portrait sessions in studio or on location.', sort_order: 43,
+      fallback_path: 'images/family portraits.png' },
+    { slug: 'service_editing', category: 'service', title: 'Video Editing', subtitle: null,
+      description: 'Professional video editing and color grading.', sort_order: 44,
+      fallback_path: 'images/Video Editing.webp' },
+    { slug: 'media_event', category: 'studio', title: 'Event Highlight', subtitle: null,
+      description: 'Event photography sample.', sort_order: 45,
+      fallback_path: 'images/event.jpg' },
     { slug: 'studio_main', category: 'studio', title: 'JJRK Studio', subtitle: null,
-      description: 'Our studio facility.', sort_order: 50 }
+      description: 'Our studio facility.', sort_order: 50,
+      fallback_path: 'images/jjrk.png' },
+    { slug: 'media_camera', category: 'studio', title: 'Camera Background', subtitle: null,
+      description: 'Login and register page background.', sort_order: 51,
+      fallback_path: 'images/camera.jpg' }
   ];
+
+  var IMAGE_FALLBACKS = {};
+  PUBLIC_IMAGE_CATALOG.forEach(function(row) {
+    if (row.fallback_path) IMAGE_FALLBACKS[row.slug] = row.fallback_path;
+  });
 
   function getSupabase() {
     return window.supabaseClient || null;
@@ -65,22 +84,19 @@
   function resolveImageUrl(record) {
     if (!record) return null;
     if (record.image_url) return record.image_url;
-    return getLocalFallback(record.slug, record) || record.local_fallback || null;
+    return getLocalFallback(record.slug, record) || null;
   }
 
-  function mergeWithFallbacks(rows) {
+  function mergeWithCatalog(rows) {
     var bySlug = {};
     (rows || []).forEach(function(r) { bySlug[r.slug] = r; });
-    return FALLBACK_CATALOG.map(function(base) {
+    return PUBLIC_IMAGE_CATALOG.map(function(base) {
       var row = bySlug[base.slug];
       if (!row) {
-        return Object.assign({}, base, {
-          local_fallback: getLocalFallback(base.slug, base),
-          image_url: null
-        });
+        return Object.assign({}, base, { image_url: null });
       }
       return Object.assign({}, base, row, {
-        local_fallback: getLocalFallback(row.slug, row)
+        fallback_path: row.fallback_path || base.fallback_path
       });
     });
   }
@@ -95,13 +111,17 @@
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  function recordForSlug(slug, bySlug) {
+    if (bySlug && bySlug[slug]) return bySlug[slug];
+    var base = PUBLIC_IMAGE_CATALOG.find(function(r) { return r.slug === slug; });
+    return base ? mergeWithCatalog([base])[0] : null;
+  }
+
   async function getImagesByCategory(category) {
     var supabase = getSupabase();
     if (!supabase) {
-      var all = mergeWithFallbacks([]);
-      if (category) {
-        all = all.filter(function(r) { return r.category === category; });
-      }
+      var all = mergeWithCatalog([]);
+      if (category) all = all.filter(function(r) { return r.category === category; });
       return { data: all, error: null };
     }
 
@@ -111,40 +131,25 @@
     var res = await q;
     if (res.error) {
       console.warn('site_images:', res.error.message);
-      var fallback = mergeWithFallbacks([]);
+      var fallback = mergeWithCatalog([]);
       if (category) fallback = fallback.filter(function(r) { return r.category === category; });
       return { data: fallback, error: null };
     }
-    return { data: mergeWithFallbacks(res.data || []), error: null };
+    return { data: mergeWithCatalog(res.data || []), error: null };
   }
 
   async function getAllImagesAdmin() {
     var supabase = getSupabase();
-    if (!supabase) {
-      return { data: mergeWithFallbacks([]), error: null };
-    }
-    var res = await supabase.from('site_images').select('*').order('category').order('sort_order', { ascending: true });
-    if (res.error) {
-      return { data: mergeWithFallbacks([]), error: res.error };
-    }
-    if (!res.data || !res.data.length) {
-      return { data: mergeWithFallbacks([]), error: null };
-    }
-    return { data: mergeWithFallbacks(res.data), error: null };
+    if (!supabase) return { data: mergeWithCatalog([]), error: null };
+    var res = await supabase.from('site_images').select('*').order('sort_order', { ascending: true });
+    if (res.error) return { data: mergeWithCatalog([]), error: res.error };
+    return { data: mergeWithCatalog(res.data || []), error: null };
   }
 
   async function getImageBySlug(slug) {
-    var supabase = getSupabase();
-    if (!supabase) {
-      var found = FALLBACK_CATALOG.find(function(r) { return r.slug === slug; });
-      return { data: found ? mergeWithFallbacks([found])[0] : null, error: null };
-    }
-    var res = await supabase.from('site_images').select('*').eq('slug', slug).maybeSingle();
-    if (res.error || !res.data) {
-      var fb = FALLBACK_CATALOG.find(function(r) { return r.slug === slug; });
-      return { data: fb ? mergeWithFallbacks([fb])[0] : null, error: res.error };
-    }
-    return { data: mergeWithFallbacks([res.data])[0], error: null };
+    var res = await getImagesByCategory(null);
+    var found = (res.data || []).find(function(r) { return r.slug === slug; });
+    return { data: found || null, error: null };
   }
 
   async function uploadAndSaveImage(slug, file) {
@@ -177,35 +182,52 @@
   function applyImageToElement(el, record) {
     if (!el || !record) return;
     var url = resolveImageUrl(record);
-    if (url) {
-      el.src = url;
-      el.alt = record.title || el.alt || '';
-      el.onerror = function() {
-        var fb = el.getAttribute('data-fallback-src');
-        if (fb && el.src !== fb) el.src = fb;
-      };
-    }
+    if (!url) return;
+    var fb = el.getAttribute('data-fallback-src') || el.getAttribute('src');
+    if (fb) el.setAttribute('data-fallback-src', fb);
+    el.src = url;
+    if (record.title) el.alt = record.title;
+    el.onerror = function() {
+      if (fb && el.src !== fb) el.src = fb;
+    };
+  }
+
+  function applyBackgroundImages(bySlug) {
+    document.querySelectorAll('[data-image-bg]').forEach(function(el) {
+      var slug = el.getAttribute('data-image-bg');
+      var rec = recordForSlug(slug, bySlug);
+      var url = resolveImageUrl(rec);
+      if (url) {
+        el.style.backgroundImage = "url('" + url.replace(/'/g, '%27') + "')";
+      }
+    });
+  }
+
+  function applyHoverImageSlugs(bySlug) {
+    document.querySelectorAll('[data-hover-image-slug]').forEach(function(el) {
+      var slug = el.getAttribute('data-hover-image-slug');
+      var url = resolveImageUrl(recordForSlug(slug, bySlug));
+      if (!url) return;
+      el.setAttribute('data-hover-image', url);
+      var hoverImg = el.querySelector('.hover-image img');
+      if (hoverImg) {
+        hoverImg.src = url;
+        hoverImg.setAttribute('data-image-slug', slug);
+      }
+    });
   }
 
   async function loadImagesIntoPage() {
-    var slugs = document.querySelectorAll('[data-image-slug]');
-    if (!slugs.length) return;
-
-    try { await ensureSupabaseReady(); } catch (e) { /* use local only */ }
+    var nodes = document.querySelectorAll('[data-image-slug]');
+    if (!nodes.length) return;
 
     var res = await getImagesByCategory(null);
     var bySlug = {};
     (res.data || []).forEach(function(row) { bySlug[row.slug] = row; });
 
-    slugs.forEach(function(el) {
+    nodes.forEach(function(el) {
       var slug = el.getAttribute('data-image-slug');
-      var staticSrc = el.getAttribute('src') || el.getAttribute('data-fallback-src');
-      if (staticSrc) el.setAttribute('data-fallback-src', staticSrc);
-      if (slug && bySlug[slug]) {
-        applyImageToElement(el, bySlug[slug]);
-      } else if (slug && getLocalFallback(slug) && !el.getAttribute('src')) {
-        el.src = getLocalFallback(slug);
-      }
+      applyImageToElement(el, recordForSlug(slug, bySlug));
     });
   }
 
@@ -213,7 +235,7 @@
     var url = resolveImageUrl(member);
     var initials = initialsFromTitle(member.title);
     var photoHtml = url
-      ? '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(member.title) + '" class="team-photo" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling&&(this.nextElementSibling.style.display=\'flex\')">' +
+      ? '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(member.title) + '" class="team-photo" loading="lazy" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'flex\'">' +
         '<div class="team-avatar" aria-hidden="true" style="display:none">' + escapeHtml(initials) + '</div>'
       : '<div class="team-avatar" aria-hidden="true">' + escapeHtml(initials) + '</div>';
 
@@ -226,11 +248,8 @@
   async function renderTeamSection(containerId) {
     var container = document.getElementById(containerId);
     if (!container) return;
-
     var res = await getImagesByCategory('team');
     var team = (res.data || []).filter(function(r) { return r.category === 'team'; });
-    if (!team.length) team = FALLBACK_CATALOG.filter(function(r) { return r.category === 'team'; });
-
     container.innerHTML = team.map(renderTeamCard).join('');
   }
 
@@ -239,19 +258,41 @@
     else if (typeof window.initializeSupabaseClient === 'function') window.initializeSupabaseClient();
   }
 
+  /** Call on every page — loads all public images by slug */
+  async function initPublicImagesOnPage() {
+    try {
+      await ensureSupabaseReady();
+    } catch (e) {
+      console.warn('Supabase optional for images:', e.message);
+    }
+    var res = await getImagesByCategory(null);
+    var bySlug = {};
+    (res.data || []).forEach(function(row) { bySlug[row.slug] = row; });
+
+    await loadImagesIntoPage();
+    applyBackgroundImages(bySlug);
+    applyHoverImageSlugs(bySlug);
+
+    if (typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('jjrk-images-ready', { detail: { count: PUBLIC_IMAGE_CATALOG.length } }));
+    }
+  }
+
   window.siteImages = {
     BUCKET: BUCKET,
+    PUBLIC_IMAGE_CATALOG: PUBLIC_IMAGE_CATALOG,
     IMAGE_FALLBACKS: IMAGE_FALLBACKS,
-    FALLBACK_CATALOG: FALLBACK_CATALOG,
+    FALLBACK_CATALOG: PUBLIC_IMAGE_CATALOG,
     getLocalFallback: getLocalFallback,
     resolveImageUrl: resolveImageUrl,
-    mergeWithFallbacks: mergeWithFallbacks,
+    mergeWithFallbacks: mergeWithCatalog,
     getImagesByCategory: getImagesByCategory,
     getAllImagesAdmin: getAllImagesAdmin,
     getImageBySlug: getImageBySlug,
     uploadAndSaveImage: uploadAndSaveImage,
     loadImagesIntoPage: loadImagesIntoPage,
     renderTeamSection: renderTeamSection,
+    initPublicImagesOnPage: initPublicImagesOnPage,
     ensureSupabaseReady: ensureSupabaseReady,
     initialsFromTitle: initialsFromTitle,
     escapeHtml: escapeHtml

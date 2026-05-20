@@ -17,7 +17,9 @@ Open **SQL Editor** → New query → paste **`images-schema-vercel.sql`** → R
 
 (After `supabase-schema.sql` + `fix-rls-policies.sql`. Safe to re-run.)
 
-This creates `site_images`, Storage bucket `jjrk-images`, and `fallback_path` for Vercel static files.
+This creates **19 public image slots** (every file in `images/`), Storage bucket `jjrk-images`, and `fallback_path` for Vercel.
+
+If you already ran an older version, also run **`sync-all-public-images.sql`**.
 
 This creates:
 

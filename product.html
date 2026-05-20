@@ -679,16 +679,7 @@
       <!-- Database Utility Functions -->
       <script src="db.js"></script>
       <script src="site-images.js"></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', async function() {
-          try {
-            await window.siteImages.ensureSupabaseReady();
-            await window.siteImages.loadImagesIntoPage();
-          } catch (e) {
-            console.warn('Product images:', e);
-          }
-        });
-      </script>
+      <script src="site-images-loader.js"></script>
     <!-- Navigation Authentication Handler -->
     <script src="nav-auth.js"></script>
 

@@ -62,14 +62,14 @@
           </div>
 
           <div class="card">
-            <img src="images/family portraits.png" alt="Studio Portraits">
+            <img src="images/family portraits.png" data-image-slug="service_portraits" alt="Studio Portraits">
             <h3>Studio Portraits</h3>
             <p>Professional portraits for personal and corporate needs.</p>
             <p style="margin-top:12px; font-size:14px; color:#6b7280; font-style:italic;">Studio sessions with professional lighting, backdrop options, and retouching services.</p>
           </div>
 
           <div class="card">
-            <img src="images/Video Editing.webp" alt="Video Editing">
+            <img src="images/Video Editing.webp" data-image-slug="service_editing" alt="Video Editing">
             <h3>Video Editing</h3>
             <p>High-quality editing services to bring your stories to life.</p>
             <p style="margin-top:12px; font-size:14px; color:#6b7280; font-style:italic;">Professional post-production including color grading, sound design, and special effects.</p>
@@ -114,16 +114,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="site-images.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      try {
-        await window.siteImages.ensureSupabaseReady();
-        await window.siteImages.loadImagesIntoPage();
-      } catch (e) {
-        console.warn('Service images:', e);
-      }
-    });
-  </script>
+  <script src="site-images-loader.js"></script>
   
 </body>
 </html>

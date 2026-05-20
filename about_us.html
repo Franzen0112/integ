@@ -111,16 +111,9 @@
   <script src="site-images.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
-      try {
-        await window.siteImages.ensureSupabaseReady();
+      if (window.siteImages) {
+        await window.siteImages.initPublicImagesOnPage();
         await window.siteImages.renderTeamSection('team-grid');
-      } catch (e) {
-        console.warn('Team load:', e);
-      }
-      try {
-        await window.siteImages.loadImagesIntoPage();
-      } catch (e2) {
-        console.warn('Images load:', e2);
       }
     });
   </script>

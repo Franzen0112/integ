@@ -105,18 +105,18 @@ CREATE POLICY "Admins delete site images" ON public.site_images
 GRANT SELECT ON public.site_images TO anon, authenticated;
 GRANT INSERT, UPDATE, DELETE ON public.site_images TO authenticated;
 
--- ----- Seed slots (fallback_path = Vercel static /images/ until admin uploads to Storage) -----
+-- ----- Seed: every image in /images (public fallback_path; anon can SELECT) -----
 INSERT INTO public.site_images (slug, category, title, subtitle, description, fallback_path, sort_order) VALUES
   ('team_ronie', 'team', 'Ronie Manaongsong', 'CEO & Founder',
-   'Ronie leads JJRK Studio with a clear vision for quality and client satisfaction.', NULL, 1),
+   'Ronie leads JJRK Studio with vision and client-focused leadership.', 'images/Rovick Polinar.png', 1),
   ('team_kim', 'team', 'Kim Duenas', 'Lead Photographer',
-   'Kim specializes in capturing authentic moments with sharp composition and natural lighting.', NULL, 2),
+   'Kim captures authentic moments with sharp composition and natural light.', 'images/Christian Kirt Basog.jpg', 2),
   ('team_drowmar', 'team', 'Drowmar Vincullado', 'Lead Videographer',
-   'Drowmar creates cinematic video content with smooth motion and strong storytelling.', NULL, 3),
+   'Drowmar creates cinematic stories for weddings and events.', 'images/Jhon Vaneth Mejos.jpg', 3),
   ('team_franzen', 'team', 'Franzen Libradilla', 'Media & Web Specialist',
-   'Franzen supports the studio''s digital side—website, booking, and media systems.', NULL, 4),
+   'Franzen manages the studio website and digital experience.', 'images/Jason S. Salim.jpg', 4),
   ('team_dec', 'team', 'Dec Bucong', 'Senior Photo & Video Editor',
-   'Dec brings photos and footage to life through color grading and precise cuts.', NULL, 5),
+   'Dec delivers polished photos and videos through expert editing.', 'images/Video Editing.webp', 5),
   ('product_wedding_basic', 'product', 'Wedding Package Basic', 'Wedding Packages',
    'Essential photo & video coverage for your wedding day.', 'images/wedding.jpg', 10),
   ('product_wedding_premium', 'product', 'Wedding Package Premium', 'Wedding Packages',
@@ -135,8 +135,16 @@ INSERT INTO public.site_images (slug, category, title, subtitle, description, fa
    'Professional videography for celebrations.', 'images/Event Videography.png', 41),
   ('service_photobooth', 'service', 'Photo Booth Rental', NULL,
    'Photo booth rental for events.', 'images/Photo Booth.jpg', 42),
+  ('service_portraits', 'service', 'Studio Portraits', NULL,
+   'Portrait sessions in studio or on location.', 'images/family portraits.png', 43),
+  ('service_editing', 'service', 'Video Editing', NULL,
+   'Professional video editing and color grading.', 'images/Video Editing.webp', 44),
+  ('media_event', 'studio', 'Event Highlight', NULL,
+   'Event photography sample.', 'images/event.jpg', 45),
   ('studio_main', 'studio', 'JJRK Studio', NULL,
-   'Our studio facility.', 'images/jjrk.png', 50)
+   'Our studio facility.', 'images/jjrk.png', 50),
+  ('media_camera', 'studio', 'Camera Background', NULL,
+   'Login and register page background.', 'images/camera.jpg', 51)
 ON CONFLICT (slug) DO UPDATE SET
   category = EXCLUDED.category,
   title = EXCLUDED.title,
