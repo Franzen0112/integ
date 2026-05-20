@@ -45,25 +45,141 @@
           <div><span>Call:</span> +63 936 328 8483</div>
         </div>
 
-        <form id="contactForm">
-          <input type="text" id="contactName" placeholder="Your Name" required>
-          <input type="email" id="contactEmail" placeholder="your@gmail.com" required>
-          <input type="text" id="contactSubject" placeholder="Subject" required>
-          <textarea id="contactMessage" placeholder="Message" rows="5" required></textarea>
-          <button type="submit">Send Message</button>
-        </form>
+        <!-- Single real-time messaging (no separate contact form) -->
+        <div class="contact-messenger" id="contactMessenger">
+          <div class="messenger-header">
+            <h3><i class="fa-solid fa-comments"></i> Message JJRK Studio</h3>
+            <p>Send a message and get a real-time reply from our team.</p>
+          </div>
 
-        <div id="contactChatBox" style="display:none; margin-top:28px; background:rgba(255,255,255,0.95); border-radius:16px; padding:20px; box-shadow:0 8px 24px rgba(0,0,0,0.12);">
-          <h3 style="margin:0 0 12px; color:#667eea;"><i class="fa-solid fa-comments"></i> Chat with JJRK Studio</h3>
-          <p style="margin:0 0 12px; font-size:13px; color:#6b7280;">Admin replies appear here in real time.</p>
-          <div id="contactChatMessages" style="max-height:280px; overflow-y:auto; padding:12px; background:#f9fafb; border-radius:12px; margin-bottom:12px;"></div>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="contactChatInput" placeholder="Type a follow-up message..." style="flex:1; padding:10px 12px; border:1px solid #d1d5db; border-radius:10px;">
-            <button type="button" id="contactChatSend" style="padding:10px 18px; background:#667eea; color:#fff; border:none; border-radius:10px; font-weight:600; cursor:pointer;">Send</button>
+          <div class="messenger-setup" id="contactSetup">
+            <input type="text" id="contactName" placeholder="Your name" required>
+            <input type="email" id="contactEmail" placeholder="your@gmail.com" required>
+            <input type="text" id="contactSubject" placeholder="Subject" required>
+          </div>
+
+          <div class="messenger-messages" id="contactChatMessages">
+            <p class="messenger-welcome">Introduce yourself above, then type your message below and press Send.</p>
+          </div>
+
+          <div class="messenger-compose">
+            <input type="text" id="contactChatInput" placeholder="Type your message..." autocomplete="off">
+            <button type="button" id="contactChatSend"><i class="fa-solid fa-paper-plane"></i> Send</button>
           </div>
         </div>
         
         <style>
+        .contact-messenger {
+          flex: 2;
+          min-width: 320px;
+          background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+          border-radius: 20px;
+          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+          border: 2px solid transparent;
+          display: flex;
+          flex-direction: column;
+          min-height: 420px;
+          overflow: hidden;
+          animation: slideIn 1s ease-out;
+        }
+
+        .contact-messenger::before {
+          content: '';
+          display: block;
+          height: 4px;
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        .messenger-header {
+          padding: 20px 20px 12px;
+        }
+
+        .messenger-header h3 {
+          margin: 0 0 6px;
+          color: #667eea;
+          font-size: 1.25rem;
+        }
+
+        .messenger-header p {
+          margin: 0;
+          font-size: 13px;
+          color: #6b7280;
+        }
+
+        .messenger-setup {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          padding: 0 16px 12px;
+        }
+
+        .messenger-setup input {
+          padding: 10px 12px;
+          border: 2px solid #e5e7eb;
+          border-radius: 10px;
+          font-size: 14px;
+        }
+
+        .messenger-setup input:first-child {
+          grid-column: 1 / -1;
+        }
+
+        .messenger-setup.hidden {
+          display: none;
+        }
+
+        .messenger-messages {
+          flex: 1;
+          margin: 0 16px;
+          padding: 14px;
+          background: #f3f4f6;
+          border-radius: 12px;
+          overflow-y: auto;
+          max-height: 320px;
+          min-height: 200px;
+        }
+
+        .messenger-welcome {
+          text-align: center;
+          color: #9ca3af;
+          font-size: 14px;
+          margin: 40px 12px;
+        }
+
+        .messenger-compose {
+          display: flex;
+          gap: 10px;
+          padding: 16px;
+        }
+
+        .messenger-compose input {
+          flex: 1;
+          padding: 12px 14px;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          font-size: 15px;
+        }
+
+        .messenger-compose button {
+          padding: 12px 22px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: #fff;
+          border: none;
+          border-radius: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .messenger-compose button:hover {
+          opacity: 0.95;
+          transform: translateY(-1px);
+        }
+
+        .messenger-compose button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
         .success-message {
           position: fixed;
           top: 20px;
@@ -186,11 +302,21 @@
           contactPollTimer = setInterval(refreshContactThread, 3000);
         }
 
+        function hideSetupFields() {
+          var setup = document.getElementById('contactSetup');
+          if (setup) setup.classList.add('hidden');
+        }
+
+        function showSetupFields() {
+          var setup = document.getElementById('contactSetup');
+          if (setup) setup.classList.remove('hidden');
+        }
+
         async function openContactChat(id, token) {
           contactThread.id = id;
           contactThread.token = token;
           localStorage.setItem('jjrk_contact_thread', JSON.stringify({ id: id, token: token }));
-          document.getElementById('contactChatBox').style.display = 'block';
+          hideSetupFields();
           await refreshContactThread();
           startContactPolling();
           if (window.messaging && window.messaging.subscribeVisitorRealtime) {
@@ -198,17 +324,87 @@
           }
         }
 
-        document.getElementById('contactChatSend').addEventListener('click', async function() {
+        async function sendContactMessage() {
           var input = document.getElementById('contactChatInput');
           var body = (input.value || '').trim();
-          if (!body || !contactThread.id) return;
-          var res = await window.messaging.visitorSendMessage(contactThread.id, contactThread.token, body);
-          if (res.error) {
-            alert(res.error.message);
-            return;
+          if (!body) return;
+
+          var btn = document.getElementById('contactChatSend');
+          btn.disabled = true;
+
+          try {
+            if (!window.messaging) {
+              throw new Error('Messaging not loaded. Refresh the page.');
+            }
+
+            if (contactThread.id && contactThread.token) {
+              var res = await window.messaging.visitorSendMessage(contactThread.id, contactThread.token, body);
+              if (res.error) {
+                showSuccessMessage('Failed: ' + res.error.message);
+                return;
+              }
+              input.value = '';
+              await refreshContactThread();
+              return;
+            }
+
+            var name = document.getElementById('contactName').value.trim();
+            var email = document.getElementById('contactEmail').value.trim();
+            var subject = document.getElementById('contactSubject').value.trim();
+
+            if (!name || !email || !subject) {
+              alert('Please fill in your name, email, and subject first.');
+              showSetupFields();
+              return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              alert('Please enter a valid email address.');
+              return;
+            }
+
+            var result = await window.messaging.createContactThread(name, email, subject, body);
+            if (result.error && window.db && window.db.createMessage) {
+              result = await window.db.createMessage({ name: name, email: email, subject: subject, message: body });
+            }
+            if (result.error) {
+              var errMsg = result.error.message || 'Unknown error';
+              if (errMsg.includes('row-level security')) {
+                errMsg += ' — Run fix-messaging-rls.sql in Supabase.';
+              }
+              showSuccessMessage('Failed: ' + errMsg);
+              return;
+            }
+
+            input.value = '';
+            showSuccessMessage('Message sent! Waiting for admin reply...');
+
+            var thread = result.data;
+            var convId = thread && (thread.conversation_id || thread.conversationId);
+            var token = thread && (thread.access_token || thread.accessToken);
+            if (convId && token) {
+              await openContactChat(convId, token);
+            } else {
+              hideSetupFields();
+            }
+
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('ref') === 'booking') {
+              showSuccessMessage('Booking submitted! Chat with us here for updates.');
+            }
+          } catch (error) {
+            console.error('Send error:', error);
+            showSuccessMessage('Error sending message. Please try again.');
+          } finally {
+            btn.disabled = false;
           }
-          input.value = '';
-          await refreshContactThread();
+        }
+
+        document.getElementById('contactChatSend').addEventListener('click', sendContactMessage);
+        document.getElementById('contactChatInput').addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendContactMessage();
+          }
         });
 
         window.addEventListener('load', async function() {
@@ -218,74 +414,9 @@
             try {
               var t = JSON.parse(saved);
               if (t.id && t.token) {
-                document.getElementById('contactChatBox').style.display = 'block';
                 await openContactChat(t.id, t.token);
               }
             } catch (e) { /* ignore */ }
-          }
-        });
-
-        document.getElementById('contactForm').addEventListener('submit', async function(e) {
-          e.preventDefault();
-
-          var name = document.getElementById('contactName').value.trim();
-          var email = document.getElementById('contactEmail').value.trim();
-          var subject = document.getElementById('contactSubject').value.trim();
-          var message = document.getElementById('contactMessage').value.trim();
-
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            alert('Please enter a valid email address.');
-            return;
-          }
-
-          var submitBtn = this.querySelector('button[type="submit"]');
-          var originalText = submitBtn.innerHTML;
-          submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
-          submitBtn.disabled = true;
-
-          try {
-            if (!window.messaging) {
-              throw new Error('Messaging not loaded. Refresh the page.');
-            }
-
-            var result = await window.messaging.createContactThread(name, email, subject, message);
-
-            if (result.error && window.db && window.db.createMessage) {
-              result = await window.db.createMessage({ name: name, email: email, subject: subject, message: message });
-            }
-
-            if (result.error) {
-              var errMsg = result.error.message || 'Unknown error';
-              if (errMsg.includes('row-level security')) {
-                errMsg += '\n\nFix: Run fix-messaging-rls.sql in Supabase SQL Editor.';
-              }
-              showSuccessMessage('Failed: ' + errMsg);
-              submitBtn.innerHTML = originalText;
-              submitBtn.disabled = false;
-              return;
-            }
-
-            var thread = result.data;
-            showSuccessMessage('Message sent! Admin will be notified. Chat below for replies.');
-            document.getElementById('contactMessage').value = '';
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-
-            var convId = thread && (thread.conversation_id || thread.conversationId);
-            var token = thread && (thread.access_token || thread.accessToken);
-            if (convId && token) {
-              await openContactChat(convId, token);
-            }
-
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('ref') === 'booking') {
-              showSuccessMessage('Your booking was submitted! We will reply here.');
-            }
-          } catch (error) {
-            console.error('Message sending error:', error);
-            showSuccessMessage('Error sending message. Please try again.');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
           }
         });
         </script>
