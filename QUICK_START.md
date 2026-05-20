@@ -39,7 +39,14 @@ Your JJRK Studio application is now configured to use Supabase as the database! 
      ```
      **Note:** Role system uses numbers: `1` = Admin, `2` = User (default)
 
-### 4. Test Your Application
+### 4. Run on Localhost (Chrome)
+   ```bash
+   npm start
+   ```
+   Open http://127.0.0.1:8080 in Chrome (do not open HTML files with `file://`).
+   See **`LOCALHOST.md`** for Supabase redirect URL setup.
+
+### 5. Test Your Application
    - Try registering a new user
    - Try logging in
    - Submit a booking from the products page

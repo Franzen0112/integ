@@ -11,6 +11,93 @@
     return window.supabaseClient || null;
   }
 
+  function normalizeEmail(email) {
+    return (email || '').trim().toLowerCase();
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
+  }
+
+  function isEmailNotConfirmedError(error) {
+    if (!error) return false;
+    const msg = (error.message || '').toLowerCase();
+    return (
+      error.code === 'email_not_confirmed' ||
+      msg.includes('email not confirmed') ||
+      msg.includes('email_not_confirmed')
+    );
+  }
+
+  function parseAuthError(error) {
+    if (!error) return {};
+    const msg = (error.message || '').toLowerCase();
+    const code = (error.code || '').toLowerCase();
+    const status = error.status || error.statusCode;
+    return {
+      isRateLimit:
+        status === 429 ||
+        msg.includes('rate limit') ||
+        code.includes('rate_limit') ||
+        code === 'over_email_send_rate_limit',
+      isAlreadyRegistered:
+        msg.includes('already registered') ||
+        msg.includes('user already registered') ||
+        msg.includes('already been registered') ||
+        code === 'user_already_exists',
+      isEmailNotConfirmed: isEmailNotConfirmedError(error),
+      isInvalidCredentials: msg.includes('invalid login credentials')
+    };
+  }
+
+  function setAuthUserMessage(error, context) {
+    if (!error) return;
+    const info = parseAuthError(error);
+
+    if (info.isRateLimit) {
+      error.userMessage =
+        'Too many signup/verification emails were sent. Your account is likely already created.\n\n' +
+        '→ Go to Login and use the same email and password.\n' +
+        '→ If login still fails: Supabase Dashboard → Authentication → Users → Confirm email for your account.\n' +
+        '→ Or turn OFF "Confirm email" under Authentication → Providers → Email.';
+      return;
+    }
+
+    if (context === 'register' && info.isAlreadyRegistered) {
+      error.userMessage =
+        'This email is already registered. Go to the Login page and sign in with your password.';
+      return;
+    }
+
+    if (info.isEmailNotConfirmed) {
+      error.userMessage =
+        'Your account exists but email is not verified yet.\n\n' +
+        'Do NOT register again. Ask the admin to open Supabase → Authentication → Users → your account → Confirm email.\n' +
+        'Or disable "Confirm email" in Authentication → Providers → Email.';
+      return;
+    }
+
+    if (info.isInvalidCredentials) {
+      error.userMessage =
+        'Wrong email or password — or your email is not confirmed yet. Try Login; if it still fails, confirm email in Supabase Dashboard.';
+      return;
+    }
+
+    error.userMessage = error.message || 'Authentication failed.';
+  }
+
+  async function signInWithPassword(supabase, email, password) {
+    const normalizedEmail = normalizeEmail(email);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: password
+    });
+    if (error) {
+      setAuthUserMessage(error, 'login');
+    }
+    return { data, error };
+  }
+
   // ===== AUTHENTICATION FUNCTIONS =====
 
   /**
@@ -30,13 +117,38 @@
         return { data: null, error };
       }
 
-      console.log('Attempting to register user:', email);
+      const normalizedEmail = normalizeEmail(email);
+      if (!isValidEmail(normalizedEmail)) {
+        const error = new Error('Please enter a valid email address (example: name@gmail.com). Usernames like "dromar" cannot be used — use your full email.');
+        error.userMessage = error.message;
+        return { data: null, error };
+      }
+
+      console.log('Checking account for:', normalizedEmail);
+
+      // LOGIN FIRST — avoids signup emails & rate limit when account already exists
+      const existingLogin = await signInWithPassword(supabase, normalizedEmail, password);
+      if (!existingLogin.error && existingLogin.data) {
+        console.log('Existing account — signed in without signup');
+        return { data: existingLogin.data, error: null, viaLogin: true };
+      }
+
+      const loginInfo = parseAuthError(existingLogin.error);
+      if (loginInfo.isEmailNotConfirmed) {
+        console.warn('Account exists but email not confirmed — skipping signup');
+        setAuthUserMessage(existingLogin.error, 'register');
+        return { data: null, error: existingLogin.error, needsEmailConfirm: true };
+      }
+
+      console.log('No active session — creating new account via signup');
       
-      // Sign up user with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
+        email: normalizedEmail,
         password: password,
         options: {
+          emailRedirectTo: (typeof window.getAuthRedirectUrl === 'function'
+            ? window.getAuthRedirectUrl()
+            : (window.location.origin + '/auth/callback.html')),
           data: {
             full_name: userData.fullname || '',
             phone: userData.phone || ''
@@ -45,7 +157,21 @@
       });
 
       if (authError) {
-        console.error('Auth error:', authError);
+        const info = parseAuthError(authError);
+
+        if (info.isRateLimit || info.isAlreadyRegistered) {
+          console.log('Signup blocked; retrying login...');
+          const retryLogin = await signInWithPassword(supabase, normalizedEmail, password);
+          if (!retryLogin.error && retryLogin.data) {
+            return { data: retryLogin.data, error: null, viaLogin: true };
+          }
+          if (retryLogin.error && parseAuthError(retryLogin.error).isEmailNotConfirmed) {
+            setAuthUserMessage(retryLogin.error, 'register');
+            return { data: null, error: retryLogin.error, needsEmailConfirm: true };
+          }
+        }
+
+        setAuthUserMessage(authError, 'register');
         return { data: null, error: authError };
       }
 
@@ -72,6 +198,15 @@
         }
       }
 
+      // No session = email confirmation required OR signup returned without session — try login
+      if (authData.user && !authData.session) {
+        console.log('No session after signup; attempting login...');
+        const loginResult = await signInWithPassword(supabase, normalizedEmail, password);
+        if (!loginResult.error && loginResult.data) {
+          return { data: loginResult.data, error: null, viaLogin: true };
+        }
+      }
+
       return { data: authData, error: null };
     } catch (error) {
       console.error('Registration error:', error);
@@ -91,14 +226,46 @@
       if (!supabase) {
         throw new Error('Supabase client not initialized. Make sure supabase-config.js is loaded.');
       }
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
+      const normalizedEmail = normalizeEmail(email);
+      if (!isValidEmail(normalizedEmail)) {
+        const error = new Error('Please enter a valid email address (example: name@gmail.com), not a username.');
+        error.userMessage = error.message;
+        return { data: null, error };
+      }
+      const { data, error } = await signInWithPassword(supabase, normalizedEmail, password);
       return { data, error };
     } catch (error) {
       console.error('Login error:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * Resend signup confirmation email
+   * @param {string} email - User email
+   */
+  async function resendConfirmationEmail(email) {
+    try {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error('Supabase client not initialized. Make sure supabase-config.js is loaded.');
+      }
+      const normalizedEmail = normalizeEmail(email);
+      const { data, error } = await supabase.auth.resend({
+        type: 'signup',
+        email: normalizedEmail,
+        options: {
+          emailRedirectTo: (typeof window.getAuthRedirectUrl === 'function'
+            ? window.getAuthRedirectUrl()
+            : (window.location.origin + '/auth/callback.html'))
+        }
+      });
+      if (error) {
+        setAuthUserMessage(error, 'resend');
+      }
+      return { data, error };
+    } catch (error) {
+      console.error('Resend confirmation error:', error);
       return { data: null, error };
     }
   }
@@ -432,6 +599,7 @@
     window.db = {
       registerUser,
       loginUser,
+      resendConfirmationEmail,
       logoutUser,
       getCurrentUser,
       isAdmin,

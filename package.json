@@ -1,0 +1,11 @@
+{
+  "name": "jjrk-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JJRK Studio — local dev server for Supabase auth testing in Chrome",
+  "scripts": {
+    "build": "node scripts/generate-supabase-config.js",
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}

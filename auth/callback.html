@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJRK Studio — Signing in...</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #434343 0%, #1a1a2e 50%, #16213e 100%);
+      color: #fff;
+      text-align: center;
+      padding: 24px;
+    }
+    .box {
+      max-width: 420px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    a { color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1 style="margin-top:0;">Signing you in...</h1>
+    <p id="status">Please wait while we confirm your account.</p>
+    <p id="error" style="display:none; color:#ffb4b4;"></p>
+    <p><a href="../login.html" id="loginLink" style="display:none;">Back to Login</a></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-config.js"></script>
+  <script src="../db.js"></script>
+  <script src="../auth-common.js"></script>
+  <script>
+    (async function() {
+      var statusEl = document.getElementById('status');
+      var errorEl = document.getElementById('error');
+      var loginLink = document.getElementById('loginLink');
+
+      try {
+        await window.waitForSupabase();
+
+        // Supabase puts tokens in URL hash after email confirm / OAuth
+        var hash = window.location.hash || '';
+        var search = window.location.search || '';
+        if (hash.indexOf('access_token') !== -1 || search.indexOf('code=') !== -1) {
+          statusEl.textContent = 'Confirming session...';
+        }
+
+        var sessionResult = await window.supabaseClient.auth.getSession();
+        var session = sessionResult.data && sessionResult.data.session;
+        var user = session && session.user;
+
+        if (!user) {
+          var userResult = await window.db.getCurrentUser();
+          user = userResult.user;
+        }
+
+        if (user) {
+          statusEl.textContent = 'Success! Redirecting...';
+          await window.authCommon.redirectAfterAuth(user, user.email);
+          return;
+        }
+
+        throw new Error('No session found. Try logging in with your email and password.');
+      } catch (err) {
+        statusEl.textContent = 'Could not complete sign-in';
+        errorEl.style.display = 'block';
+        errorEl.textContent = err.message || 'Unknown error';
+        loginLink.style.display = 'inline';
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -15,6 +15,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      background: linear-gradient(135deg, #434343 0%, #1a1a2e 50%, #16213e 100%);
       background-image: url('images/camera.jpg');
       background-size: cover;
       background-position: center;
@@ -279,7 +280,7 @@
       <form id="loginForm">
         <div class="form-group">
           <label for="email">Enter your email</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+          <input type="email" id="email" name="email" placeholder="you@gmail.com" autocomplete="email" required>
         </div>
 
         <div class="form-group">
@@ -309,8 +310,13 @@
     </div>
   </div>
 
+  <!-- Supabase JS Library (must load before login handler) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="db.js"></script>
+  <script src="auth-common.js"></script>
+
   <script>
-    // Password toggle functionality
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const eyeIcon = togglePassword.querySelector('i');
@@ -318,8 +324,6 @@
     togglePassword.addEventListener('click', function() {
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
-      
-      // Toggle eye icon
       if (type === 'password') {
         eyeIcon.classList.remove('fa-eye-slash');
         eyeIcon.classList.add('fa-eye');
@@ -329,114 +333,93 @@
       }
     });
 
-    // Supabase authentication
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      
+    function setLoginPending(isPending) {
+      const btn = document.querySelector('.login-button');
+      if (!btn) return;
+      btn.disabled = isPending;
+      btn.querySelector('span').textContent = isPending ? 'Logging in...' : 'Log In';
+    }
+
+    async function setupLoginForm() {
       try {
-        // Login with Supabase
-        const result = await window.db.loginUser(email, password);
-
-        if (result.error) {
-          alert('Login failed: ' + result.error.message);
-          return;
-        }
-
-        if (result.data && result.data.user) {
-          // Check if user is admin
-          const userId = result.data.user.id;
-          const userEmail = result.data.user.email;
-          
-          console.log('=== LOGIN DEBUG INFO ===');
-          console.log('User ID:', userId);
-          console.log('User Email:', userEmail);
-          console.log('Checking admin status...');
-          
-          const adminCheck = await window.db.isAdmin(userId);
-          
-          console.log('=== ADMIN CHECK RESULT ===');
-          console.log('Admin check returned:', adminCheck);
-          console.log('Type:', typeof adminCheck);
-          
-          if (adminCheck === true) {
-            console.log('✅ User is ADMIN - Setting session and redirecting...');
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            sessionStorage.setItem('userId', userId);
-            sessionStorage.setItem('userEmail', userEmail);
-            
-            // Force redirect
-            console.log('Redirecting to admin_dashboard.html...');
-            window.location.replace('admin_dashboard.html');
-          } else {
-            console.log('❌ User is NOT admin - Redirecting to regular dashboard');
-            console.log('Admin check value:', adminCheck);
-            sessionStorage.setItem('userLoggedIn', 'true');
-            sessionStorage.setItem('userId', userId);
-            sessionStorage.setItem('userEmail', userEmail);
-            alert('Login successful! Redirecting to dashboard...');
-            window.location.href = 'dashboard.html';
-          }
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        console.error('Full error details:', error);
-        alert('An error occurred during login. Please check console for details.');
-      }
-    });
-    
-    // Test function to verify admin status (can be called from console)
-    window.testAdminStatus = async function(email) {
-      console.log('=== TESTING ADMIN STATUS ===');
-      if (!window.db) {
-        console.error('Database functions not loaded!');
+        await window.authCommon.ensureAuthReady();
+      } catch (err) {
+        alert(err.message);
         return;
       }
-      
-      try {
-        // Get user by email from Supabase
-        const supabase = window.supabaseClient;
-        if (!supabase) {
-          console.error('Supabase client not available');
+
+      const params = new URLSearchParams(window.location.search);
+      const emailFromUrl = params.get('email');
+      if (emailFromUrl) {
+        document.getElementById('email').value = emailFromUrl;
+      }
+      if (params.get('confirm') === '1') {
+        alert(
+          'Your account exists but email is not confirmed.\n\n' +
+          'Supabase Dashboard → Authentication → Users → Confirm email.\n' +
+          'Or turn OFF "Confirm email" under Providers → Email.'
+        );
+      }
+
+      await window.authCommon.tryRestoreSession();
+
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!window.authCommon.isValidEmail(email)) {
+          alert('Use your full email address (example: name@gmail.com).\n\nUsernames like "dromar" will not work.');
           return;
         }
-        
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id, email, role')
-          .eq('email', email)
-          .single();
-          
-        console.log('User data from database:', userData);
-        console.log('User error:', userError);
-        
-        if (userData) {
-          console.log('User found:', {
-            id: userData.id,
-            email: userData.email,
-            role: userData.role,
-            roleType: typeof userData.role,
-            isAdmin: userData.role === 1 || userData.role === '1'
-          });
-          
-          // Test isAdmin function
-          const adminCheck = await window.db.isAdmin(userData.id);
-          console.log('isAdmin function result:', adminCheck);
+        if (!password) {
+          alert('Please enter your password.');
+          return;
         }
-      } catch (error) {
-        console.error('Test error:', error);
-      }
-    };
-  </script>
 
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Supabase Configuration -->
-  <script src="supabase-config.js"></script>
-  <!-- Database Utility Functions -->
-  <script src="db.js"></script>
+        setLoginPending(true);
+
+        try {
+          await window.authCommon.ensureAuthReady();
+          const result = await window.db.loginUser(email, password);
+
+          if (result.error) {
+            const msg = result.error.userMessage || result.error.message;
+            const errLower = (result.error.message || '').toLowerCase();
+            const isRateLimit = errLower.includes('rate limit');
+            const needsConfirm =
+              result.error.code === 'email_not_confirmed' ||
+              errLower.includes('email not confirmed');
+
+            if (needsConfirm && !isRateLimit) {
+              alert(msg + '\n\nAdmin: confirm your email in Supabase Dashboard → Authentication → Users.');
+            } else {
+              alert('Login failed:\n\n' + msg);
+            }
+            return;
+          }
+
+          const user = result.data && (result.data.user || result.data.session?.user);
+          if (!user) {
+            alert('Login failed: No session returned. In Supabase, confirm your email or disable "Confirm email".');
+            return;
+          }
+
+          await window.authCommon.redirectAfterAuth(user, email);
+        } catch (error) {
+          console.error('Login error:', error);
+          alert(error.message || 'Login failed. Please try again.');
+        } finally {
+          setLoginPending(false);
+        }
+      });
+    }
+
+    window.addEventListener('load', function() {
+      setupLoginForm();
+    });
+  </script>
 </body>
 </html>
 

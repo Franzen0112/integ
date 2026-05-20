@@ -1,5 +1,7 @@
 # Vercel Deployment Notes
 
+**Full step-by-step setup:** see **[VERCEL_SETUP.md](./VERCEL_SETUP.md)** (Supabase keys + Vercel deploy + redirect URLs).
+
 ## Important: 404 Error Fix
 
 Kung makakita ka ug **404: NOT_FOUND** error sa Vercel, kasagaran tungod kay:

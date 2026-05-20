@@ -1,0 +1,17 @@
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Archives (extract images/ instead of committing zips)
+*.zip
+
+# Logs
+*.log

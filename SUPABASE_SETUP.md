@@ -48,7 +48,23 @@ Make sure all your HTML files that need database access include these scripts in
 <script src="db.js"></script>
 ```
 
-## Step 5: Test the Setup
+## Step 5: Run on Localhost (Chrome)
+
+See **`LOCALHOST.md`** for full steps. Quick version:
+
+```bash
+npm start
+```
+
+Open http://127.0.0.1:8080/login.html in Chrome.
+
+Add these URLs in Supabase → **Authentication** → **URL Configuration** (full list: **`SUPABASE_REDIRECT_URLS.md`**):
+- Site URL: `http://127.0.0.1:8080` (local) or your Vercel URL (production)
+- Redirect URLs must include **`/auth/callback.html`** (auth callback after email confirm)
+
+The same Supabase accounts work on localhost and production.
+
+## Step 6: Test the Setup
 
 1. Try registering a new user
 2. Try logging in
@@ -92,6 +108,24 @@ Make sure all your HTML files that need database access include these scripts in
 ### Authentication not working
 - Verify that Supabase Auth is enabled in your project
 - Check the browser console for detailed error messages
+
+### User is in database but cannot login
+This usually means the account exists in the `users` table but Supabase Auth still requires email confirmation.
+
+**Option A (recommended for development):** Disable email confirmation
+1. Supabase Dashboard → **Authentication** → **Providers** → **Email**
+2. Turn **OFF** "Confirm email"
+3. Save, then register a new test user OR manually confirm existing users (Option B)
+
+**Option B:** Confirm existing users manually
+1. Supabase Dashboard → **Authentication** → **Users**
+2. Open the user → click **Confirm email** (or set email as confirmed)
+
+**Option C:** User verifies via email
+- After register, check inbox/spam for the confirmation link
+- On login page, if you see "email not confirmed", use the resend prompt
+
+Also run `fix-rls-policies.sql` in the SQL Editor if admin login redirects fail after a successful login.
 
 ## Need Help?
 

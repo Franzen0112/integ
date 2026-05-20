@@ -15,6 +15,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      background: linear-gradient(135deg, #434343 0%, #1a1a2e 50%, #16213e 100%);
       background-image: url('images/camera.jpg');
       background-size: cover;
       background-position: center;
@@ -281,8 +282,13 @@
         <span>Back to Dashboard</span>
       </a>
       <h1>Register</h1>
+
+      <div id="registerNotice" style="display:none; background:rgba(255,193,7,0.25); border:1px solid rgba(255,193,7,0.6); color:#fff; padding:12px 14px; border-radius:10px; margin-bottom:18px; font-size:13px; line-height:1.5;">
+        <strong>Already registered?</strong> Do not click Sign Up again (causes email rate limit).<br>
+        <a href="login.html" style="color:#fff; font-weight:700;">Go to Login →</a>
+      </div>
       
-      <form>
+      <form id="registerForm">
         <div class="form-row">
           <div class="form-group">
             <label for="fullname">Full Name</label>
@@ -291,7 +297,7 @@
 
           <div class="form-group">
             <label for="email">Enter your email</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <input type="email" id="email" name="email" placeholder="you@gmail.com" autocomplete="email" required>
           </div>
         </div>
 
@@ -340,6 +346,11 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="db.js"></script>
+  <script src="auth-common.js"></script>
+
   <script>
     // Password toggle functionality for password field
     const togglePassword = document.getElementById('togglePassword');
@@ -379,134 +390,96 @@
       }
     });
 
-    // Wait for all scripts to load before setting up form handler
-    function setupFormHandler() {
-      // Debug: Check what's loaded
-      console.log('Setting up form handler...');
-      console.log('window.supabase:', typeof window.supabase);
-      console.log('window.supabaseClient:', window.supabaseClient);
-      console.log('window.db:', typeof window.db);
-      
-      // Check if Supabase library is loaded
-      if (typeof window.supabase === 'undefined') {
-        console.error('❌ Supabase library not loaded!');
-        alert('Supabase library failed to load. Please refresh the page.');
-        return;
-      }
-      
-      // Check if Supabase client is initialized
-      if (!window.supabaseClient) {
-        console.error('❌ Supabase client not initialized!');
-        console.log('Retrying initialization...');
-        // Try to initialize again
-        if (typeof initializeSupabaseClient === 'function') {
-          initializeSupabaseClient();
-        }
-        setTimeout(function() {
-          if (!window.supabaseClient) {
-            alert('Database connection failed. Please check:\n1. Internet connection\n2. Browser console for errors (F12)\n3. Refresh the page');
-          }
-        }, 1000);
-      } else {
-        console.log('✅ Supabase client initialized');
-      }
-      
-      // Check if db functions are available
-      if (typeof window.db === 'undefined' || !window.db.registerUser) {
-        console.error('❌ Database functions not loaded. Make sure supabase-config.js and db.js are loaded.');
-        alert('Database functions not loaded. Please refresh the page.');
-        return;
-      }
-      
-      console.log('✅ All scripts loaded successfully');
+    async function setupFormHandler() {
+      const notice = document.getElementById('registerNotice');
+      if (notice) notice.style.display = 'block';
 
-      // Password match validation and Supabase registration
-      const form = document.querySelector('form');
+      try {
+        await window.authCommon.ensureAuthReady();
+      } catch (err) {
+        alert(err.message);
+        return;
+      }
+
+      if (await window.authCommon.tryRestoreSession()) {
+        return;
+      }
+
+      const form = document.getElementById('registerForm');
+      const submitBtn = form.querySelector('.register-button span');
+
       form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
-        const fullname = document.getElementById('fullname').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
+        const fullname = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
 
+        if (!window.authCommon.isValidEmail(email)) {
+          alert('Enter a valid email (example: name@gmail.com). Usernames cannot be used.');
+          return;
+        }
         if (password !== confirmPassword) {
           alert('Passwords do not match!');
-          return false;
+          return;
         }
-
-        // Validate password strength (at least 6 characters)
         if (password.length < 6) {
-          alert('Password must be at least 6 characters long!');
-          return false;
-        }
-
-        // Check if Supabase is initialized
-        if (!window.supabaseClient) {
-          alert('Database connection not ready. Please refresh the page and try again.');
-          console.error('Supabase client not initialized');
+          alert('Password must be at least 6 characters.');
           return;
         }
 
-        // Register user with Supabase
+        const originalBtnText = submitBtn ? submitBtn.textContent : 'Sign Up';
+        if (submitBtn) submitBtn.textContent = 'Please wait...';
+        form.querySelector('.register-button').disabled = true;
+
         try {
+          await window.authCommon.ensureAuthReady();
           const result = await window.db.registerUser(email, password, {
             fullname: fullname,
             phone: phone
           });
 
           if (result.error) {
-            console.error('Registration error details:', result.error);
-            let errorMessage = 'Registration failed: ';
-            
-            // More specific error messages
-            if (result.error.message.includes('already registered')) {
-              errorMessage += 'This email is already registered. Please use a different email or try logging in.';
-            } else if (result.error.message.includes('relation') && result.error.message.includes('does not exist')) {
-              errorMessage += 'Database tables not set up. Please contact the administrator.';
-            } else if (result.error.message.includes('duplicate key')) {
-              errorMessage += 'This email is already registered.';
-            } else {
-              errorMessage += result.error.message || 'Unknown error occurred.';
+            const msg = result.error.userMessage || result.error.message || 'Unknown error';
+            if (result.needsEmailConfirm) {
+              alert(msg);
+              window.location.href = 'login.html?email=' + encodeURIComponent(email) + '&confirm=1';
+              return;
             }
-            
-            alert(errorMessage);
+            if (confirm(msg + '\n\nOpen Login page?')) {
+              window.location.href = 'login.html?email=' + encodeURIComponent(email);
+            }
             return;
           }
 
-          alert('Registration successful! Please check your email to verify your account, then you can login.');
-          window.location.href = 'login.html';
-        } catch (error) {
-          console.error('Registration error:', error);
-          let errorMessage = 'An error occurred during registration. ';
-          
-          if (error.message) {
-            errorMessage += error.message;
-          } else if (error.toString) {
-            errorMessage += error.toString();
+          const authData = result.data;
+          const user = authData && (authData.user || authData.session?.user);
+
+          if (user && (result.viaLogin || authData.session)) {
+            await window.authCommon.redirectAfterAuth(user, email);
+            return;
           }
-          
-          alert(errorMessage);
+
+          alert(
+            'Account created. If login fails:\n' +
+            '1) Use Login (same email + password)\n' +
+            '2) Supabase → Users → Confirm email\n' +
+            '   OR disable "Confirm email" in Providers → Email'
+          );
+          window.location.href = 'login.html?email=' + encodeURIComponent(email);
+        } catch (error) {
+          alert(error.message || 'Registration failed.');
+        } finally {
+          if (submitBtn) submitBtn.textContent = originalBtnText;
+          form.querySelector('.register-button').disabled = false;
         }
       });
     }
 
-    // Wait for scripts to load
-    window.addEventListener('load', function() {
-      // Give scripts a moment to initialize
-      setTimeout(function() {
-        setupFormHandler();
-      }, 500);
-    });
+    window.addEventListener('load', setupFormHandler);
   </script>
-
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Supabase Configuration -->
-  <script src="supabase-config.js"></script>
-  <!-- Database Utility Functions -->
-  <script src="db.js"></script>
 </body>
 </html>
 
