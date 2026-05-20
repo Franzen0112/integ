@@ -481,13 +481,13 @@
           </div>
     <div class="product-grid">
           <div class="product-card">
-        <img src="images/wedding.jpg" alt="Wedding Basic">
+        <img src="images/wedding.jpg" data-image-slug="product_wedding_basic" alt="Wedding Basic">
             <h3>Wedding Package Basic</h3>
             <p>Essential photo & video coverage for your wedding day.</p>
             <button onclick="bookNow('Wedding Package Basic')">Book Now</button>
           </div>
           <div class="product-card">
-        <img src="images/family portraits.png" alt="Wedding Premium">
+        <img src="images/family portraits.png" data-image-slug="product_wedding_premium" alt="Wedding Premium">
             <h3>Wedding Package Premium</h3>
             <p>Comprehensive photo & video coverage with premium features.</p>
             <button onclick="bookNow('Wedding Package Premium')">Book Now</button>
@@ -499,13 +499,13 @@
     </div>
     <div class="product-grid">
           <div class="product-card">
-        <img src="images/Event Coverage Standard.jpg" alt="Event Standard">
+        <img src="images/Event Coverage Standard.jpg" data-image-slug="product_event_standard" alt="Event Standard">
             <h3>Event Coverage Standard</h3>
             <p>High-quality photography & videography for special occasions.</p>
             <button onclick="bookNow('Event Coverage Standard')">Book Now</button>
           </div>
           <div class="product-card">
-        <img src="images/Event Coverage Premium.avif" alt="Event Premium">
+        <img src="images/Event Coverage Premium.avif" data-image-slug="product_event_premium" alt="Event Premium">
             <h3>Event Coverage Premium</h3>
             <p>Premium event coverage with extended hours and multiple cameras.</p>
             <button onclick="bookNow('Event Coverage Premium')">Book Now</button>
@@ -517,13 +517,13 @@
     </div>
     <div class="product-grid">
           <div class="product-card">
-            <img src="images/Photo Booth.jpg" alt="Photo Booth Basic">
+            <img src="images/Photo Booth.jpg" data-image-slug="product_photobooth_basic" alt="Photo Booth Basic">
             <h3>Photo Booth Basic</h3>
             <p>Fun and interactive photo booth setup for your parties.</p>
             <button onclick="bookNow('Photo Booth Basic')">Book Now</button>
           </div>
           <div class="product-card">
-            <img src="images/Photo Booth Deluxe.jpg" alt="Photo Booth Deluxe">
+            <img src="images/Photo Booth Deluxe.jpg" data-image-slug="product_photobooth_deluxe" alt="Photo Booth Deluxe">
             <h3>Photo Booth Deluxe</h3>
             <p>Premium photo booth with props and custom backgrounds.</p>
             <button onclick="bookNow('Photo Booth Deluxe')">Book Now</button>
@@ -678,6 +678,17 @@
       <script src="supabase-config.js"></script>
       <!-- Database Utility Functions -->
       <script src="db.js"></script>
+      <script src="site-images.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+          try {
+            await window.siteImages.ensureSupabaseReady();
+            await window.siteImages.loadImagesIntoPage();
+          } catch (e) {
+            console.warn('Product images:', e);
+          }
+        });
+      </script>
     <!-- Navigation Authentication Handler -->
     <script src="nav-auth.js"></script>
 

@@ -41,21 +41,21 @@
       <div class="container">
         <div class="grid">
           <div class="card">
-            <img src="images/wedding.jpg" alt="Wedding Photography">
+            <img src="images/wedding.jpg" data-image-slug="service_wedding" alt="Wedding Photography">
             <h3>Wedding Photography</h3>
             <p>Capturing your most precious wedding moments with creativity and style.</p>
             <p style="margin-top:12px; font-size:14px; color:#6b7280; font-style:italic;">Professional wedding photography services including pre-wedding shoots, ceremony coverage, and reception documentation.</p>
           </div>
 
           <div class="card">
-            <img src="images/Event Videography.png" alt="Event Videography">
+            <img src="images/Event Videography.png" data-image-slug="service_event" alt="Event Videography">
             <h3>Event Videography</h3>
             <p>Professional videography services for weddings, birthdays, and corporate events.</p>
             <p style="margin-top:12px; font-size:14px; color:#6b7280; font-style:italic;">High-quality video production with multiple camera angles, professional editing, and cinematic storytelling.</p>
           </div>
 
           <div class="card">
-            <img src="images/Photo Booth.jpg" alt="Photo Booth Rental">
+            <img src="images/Photo Booth.jpg" data-image-slug="service_photobooth" alt="Photo Booth Rental">
             <h3>Photo Booth Rental</h3>
             <p>Add fun and instant prints to your parties and celebrations.</p>
             <p style="margin-top:12px; font-size:14px; color:#6b7280; font-style:italic;">Interactive photo booth with props, instant prints, and digital copies for all your event guests.</p>
@@ -111,6 +111,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Navigation Authentication Handler -->
   <script src="nav-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="site-images.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        await window.siteImages.ensureSupabaseReady();
+        await window.siteImages.loadImagesIntoPage();
+      } catch (e) {
+        console.warn('Service images:', e);
+      }
+    });
+  </script>
   
 </body>
 </html>

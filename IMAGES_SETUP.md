@@ -1,0 +1,36 @@
+# Site Images (Database + Auto-Save)
+
+## 1. Run SQL in Supabase
+
+Open **SQL Editor** and run (after `supabase-schema.sql` + `fix-rls-policies.sql`):
+
+```
+images-schema.sql
+```
+
+This creates:
+
+- Table `site_images` (team, products, services, studio)
+- Storage bucket `jjrk-images` (public read)
+- Seed rows for all image slots
+
+## 2. Admin upload
+
+1. Login as **admin** (`role = 1` in `users` table)
+2. Open **Admin Dashboard** → section **Site Images**
+3. Click **Change photo** on any card — file uploads and **saves automatically** (Storage URL + database row)
+
+## 3. Public pages (load from database)
+
+| Page | What updates |
+|------|----------------|
+| `about_us.html` | Team grid + studio photos |
+| `product.html` | Product offer images |
+| `services.html` | Main service images |
+
+Until you upload, pages use fallback images in `images/` folder or initials (team).
+
+## Troubleshooting
+
+- **Upload failed** — Confirm admin login (Supabase session), run `images-schema.sql`, check Storage bucket `jjrk-images` exists.
+- **Photos not showing on site** — Hard refresh (`Ctrl+F5`); check `site_images.image_url` in Supabase Table Editor.

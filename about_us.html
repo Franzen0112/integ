@@ -38,7 +38,7 @@
 
     <section class="about">
       <div class="container">
-        <img src="images/jjrk.png" alt="JJRK Studio Office" style="max-width:400px; height:auto;">
+        <img src="images/jjrk.png" data-image-slug="studio_main" alt="JJRK Studio Office" style="max-width:400px; height:auto;">
         <div class="about-content">
           <h3>Welcome to JJRK Studio</h3>
           <p>JJRK Studio is a passionate team of professional photographers and videographers dedicated to capturing life's most memorable moments. We provide high-quality multimedia services for weddings, events, and all your special occasions. With years of experience in the industry, we have built a reputation for excellence, creativity, and attention to detail. Our studio is equipped with the latest photography and videography equipment, ensuring that every shot is captured with precision and artistry.</p>
@@ -54,7 +54,7 @@
     <section class="about" style="background:#d7d7d7; padding:60px 0;">
       <div class="container" style="max-width:1100px; margin:auto; text-align:center;">
         <h2 style="color:#000000; margin-bottom:30px; font-weight:bold;">OUR STUDIO</h2>
-        <img src="images/jjrk.png" alt="JJRK Studio Office" style="max-width:600px; width:100%; height:auto; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
+        <img src="images/jjrk.png" data-image-slug="studio_main" alt="JJRK Studio Office" style="max-width:600px; width:100%; height:auto; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
         <p style="margin-top:20px; color:#000000; max-width:800px; margin-left:auto; margin-right:auto;">Our modern studio facility is designed to provide a comfortable and professional environment for all our photography and videography services. Located in the heart of the city, our studio features state-of-the-art equipment and spacious areas for various types of shoots and events.</p>
       </div>
     </section>
@@ -63,43 +63,8 @@
     <section class="about team-section" style="background:#ffffff; padding:60px 0;">
       <div class="container" style="max-width:1200px; margin:auto;">
         <h2 style="text-align:center; margin-bottom:40px; color:#000000; font-weight:bold;">Our Team</h2>
-        <div class="team-grid">
-
-          <div class="team-card">
-            <div class="team-avatar" aria-hidden="true">RM</div>
-            <h3>Ronie Manaongsong</h3>
-            <p class="team-role">CEO &amp; Founder</p>
-            <p class="team-bio">Ronie leads JJRK Studio with a clear vision for quality and client satisfaction. He oversees operations, creative direction, and team coordination to make sure every wedding, event, and project is delivered with professionalism and heart.</p>
-          </div>
-
-          <div class="team-card">
-            <div class="team-avatar" aria-hidden="true">KD</div>
-            <h3>Kim Duenas</h3>
-            <p class="team-role">Lead Photographer</p>
-            <p class="team-bio">Kim specializes in capturing authentic moments with sharp composition and natural lighting. From portraits to full event coverage, she delivers clean, emotional images that tell your story frame by frame.</p>
-          </div>
-
-          <div class="team-card">
-            <div class="team-avatar" aria-hidden="true">DV</div>
-            <h3>Drowmar Vincullado</h3>
-            <p class="team-role">Lead Videographer</p>
-            <p class="team-bio">Drowmar creates cinematic video content with smooth motion, clear audio, and strong storytelling. He handles filming, directing on-site shots, and editing highlights that clients love to share and keep forever.</p>
-          </div>
-
-          <div class="team-card">
-            <div class="team-avatar" aria-hidden="true">FL</div>
-            <h3>Franzen Libradilla</h3>
-            <p class="team-role">Media &amp; Web Specialist</p>
-            <p class="team-bio">Franzen supports the studio’s digital side—website, online booking flow, and media systems—so clients can reach us easily and receive a smooth modern experience from inquiry to final delivery.</p>
-          </div>
-
-          <div class="team-card">
-            <div class="team-avatar" aria-hidden="true">DB</div>
-            <h3>Dec Bucong</h3>
-            <p class="team-role">Senior Photo &amp; Video Editor</p>
-            <p class="team-bio">Dec brings photos and footage to life through color grading, retouching, and precise cuts. His attention to detail ensures every final album and video meets JJRK Studio’s high standard before it reaches the client.</p>
-          </div>
-
+        <div class="team-grid" id="team-grid">
+          <!-- Team photos & bios loaded from database -->
         </div>
       </div>
     </section>
@@ -137,6 +102,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Navigation Authentication Handler -->
   <script src="nav-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="site-images.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        await window.siteImages.ensureSupabaseReady();
+        await window.siteImages.renderTeamSection('team-grid');
+      } catch (e) {
+        console.warn('Team load:', e);
+      }
+      try {
+        await window.siteImages.loadImagesIntoPage();
+      } catch (e2) {
+        console.warn('Images load:', e2);
+      }
+    });
+  </script>
 
 </body>
 </html>
