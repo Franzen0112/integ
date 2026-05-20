@@ -283,9 +283,9 @@
       </a>
       <h1>Register</h1>
 
-      <div id="registerNotice" style="display:none; background:rgba(255,193,7,0.25); border:1px solid rgba(255,193,7,0.6); color:#fff; padding:12px 14px; border-radius:10px; margin-bottom:18px; font-size:13px; line-height:1.5;">
-        <strong>Already registered?</strong> Do not click Sign Up again (causes email rate limit).<br>
-        <a href="login.html" style="color:#fff; font-weight:700;">Go to Login →</a>
+      <div id="registerNotice" style="background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff; padding:12px 14px; border-radius:10px; margin-bottom:18px; font-size:13px; line-height:1.5;">
+        <strong>New email?</strong> Sign Up to create an account.<br>
+        <strong>Already have an account?</strong> Enter the same email + password — you will be <strong>logged in automatically</strong> (no duplicate signup). Or use <a href="login.html" style="color:#fff; font-weight:700;">Login</a>.
       </div>
       
       <form id="registerForm">
@@ -391,9 +391,6 @@
     });
 
     async function setupFormHandler() {
-      const notice = document.getElementById('registerNotice');
-      if (notice) notice.style.display = 'block';
-
       try {
         await window.authCommon.ensureAuthReady();
       } catch (err) {
@@ -457,17 +454,26 @@
           const authData = result.data;
           const user = authData && (authData.user || authData.session?.user);
 
-          if (user && (result.viaLogin || authData.session)) {
+          if (user && (result.viaLogin || result.status === 'logged_in')) {
             await window.authCommon.redirectAfterAuth(user, email);
             return;
           }
 
-          alert(
-            'Account created. If login fails:\n' +
-            '1) Use Login (same email + password)\n' +
-            '2) Supabase → Users → Confirm email\n' +
-            '   OR disable "Confirm email" in Providers → Email'
-          );
+          if (user && (authData.session || result.status === 'registered')) {
+            await window.authCommon.redirectAfterAuth(user, email);
+            return;
+          }
+
+          if (result.needsEmailConfirm) {
+            alert(
+              'Account created for ' + email + '.\n\n' +
+              'Confirm email in Supabase (Users → Confirm email) or turn OFF Confirm email, then Login.'
+            );
+            window.location.href = 'login.html?email=' + encodeURIComponent(email) + '&confirm=1';
+            return;
+          }
+
+          alert('Something went wrong. Try Login with your email and password.');
           window.location.href = 'login.html?email=' + encodeURIComponent(email);
         } catch (error) {
           alert(error.message || 'Registration failed.');

@@ -107,10 +107,48 @@
    * @param {Object} userData - Additional user data (fullname, phone)
    * @returns {Promise<Object>} - Registration result
    */
+  function isLikelyExistingUserFromSignup(authData) {
+    const user = authData && authData.user;
+    if (!user) return false;
+    const identities = user.identities;
+    return !identities || identities.length === 0;
+  }
+
+  async function tryLoginAndReturn(supabase, email, password, options) {
+    options = options || {};
+    const loginResult = await signInWithPassword(supabase, email, password);
+    if (!loginResult.error && loginResult.data) {
+      return {
+        data: loginResult.data,
+        error: null,
+        viaLogin: true,
+        status: 'logged_in'
+      };
+    }
+    const info = parseAuthError(loginResult.error);
+    if (info.isEmailNotConfirmed) {
+      setAuthUserMessage(loginResult.error, 'register');
+      return {
+        data: null,
+        error: loginResult.error,
+        needsEmailConfirm: true,
+        status: 'needs_confirm'
+      };
+    }
+    if (options.wantError) {
+      setAuthUserMessage(loginResult.error, 'register');
+      return { data: null, error: loginResult.error, status: 'error' };
+    }
+    return null;
+  }
+
+  /**
+   * Register OR sign in: existing users log in immediately; new emails create an account.
+   */
   async function registerUser(email, password, userData = {}) {
     try {
       const supabase = getSupabaseClient();
-      
+
       if (!supabase) {
         const error = new Error('Supabase client not initialized. Make sure supabase-config.js is loaded and Supabase library is available.');
         console.error('Registration failed:', error);
@@ -119,29 +157,21 @@
 
       const normalizedEmail = normalizeEmail(email);
       if (!isValidEmail(normalizedEmail)) {
-        const error = new Error('Please enter a valid email address (example: name@gmail.com). Usernames like "dromar" cannot be used — use your full email.');
+        const error = new Error('Please enter a valid email address (example: name@gmail.com).');
         error.userMessage = error.message;
         return { data: null, error };
       }
 
-      console.log('Checking account for:', normalizedEmail);
-
-      // LOGIN FIRST — avoids signup emails & rate limit when account already exists
-      const existingLogin = await signInWithPassword(supabase, normalizedEmail, password);
-      if (!existingLogin.error && existingLogin.data) {
-        console.log('Existing account — signed in without signup');
-        return { data: existingLogin.data, error: null, viaLogin: true };
+      // 1) Existing account with correct password → log in immediately (no signup email)
+      const existingSession = await tryLoginAndReturn(supabase, normalizedEmail, password);
+      if (existingSession) {
+        console.log('Register: existing user logged in');
+        return existingSession;
       }
 
-      const loginInfo = parseAuthError(existingLogin.error);
-      if (loginInfo.isEmailNotConfirmed) {
-        console.warn('Account exists but email not confirmed — skipping signup');
-        setAuthUserMessage(existingLogin.error, 'register');
-        return { data: null, error: existingLogin.error, needsEmailConfirm: true };
-      }
+      // 2) New email (login = invalid credentials) → sign up
+      console.log('Register: new email, signing up:', normalizedEmail);
 
-      console.log('No active session — creating new account via signup');
-      
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: password,
@@ -159,55 +189,59 @@
       if (authError) {
         const info = parseAuthError(authError);
 
+        // Email already registered → log in instead of failing
         if (info.isRateLimit || info.isAlreadyRegistered) {
-          console.log('Signup blocked; retrying login...');
-          const retryLogin = await signInWithPassword(supabase, normalizedEmail, password);
-          if (!retryLogin.error && retryLogin.data) {
-            return { data: retryLogin.data, error: null, viaLogin: true };
-          }
-          if (retryLogin.error && parseAuthError(retryLogin.error).isEmailNotConfirmed) {
-            setAuthUserMessage(retryLogin.error, 'register');
-            return { data: null, error: retryLogin.error, needsEmailConfirm: true };
+          const retry = await tryLoginAndReturn(supabase, normalizedEmail, password, { wantError: true });
+          if (retry && !retry.error) {
+            return retry;
           }
         }
 
         setAuthUserMessage(authError, 'register');
-        return { data: null, error: authError };
+        return { data: null, error: authError, status: 'error' };
       }
 
-      console.log('Auth successful, user created:', authData.user?.id);
+      // Supabase returns empty identities when email already exists (anti-enumeration)
+      if (isLikelyExistingUserFromSignup(authData)) {
+        console.log('Register: email already exists, logging in');
+        const retry = await tryLoginAndReturn(supabase, normalizedEmail, password, { wantError: true });
+        if (retry) {
+          return retry;
+        }
+        const err = new Error('This email is already registered. Use Login with your password.');
+        err.userMessage = err.message;
+        return { data: null, error: err, status: 'error' };
+      }
 
-      // The trigger should automatically create the user profile
-      // But we'll try to update it with additional data if needed
       if (authData.user) {
-        // Wait a bit for the trigger to execute
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Try to update the user profile with additional data
-        const { error: updateError } = await supabase
+        await new Promise(function(resolve) { setTimeout(resolve, 500); });
+        await supabase
           .from('users')
           .update({
             full_name: userData.fullname || '',
             phone: userData.phone || ''
           })
           .eq('id', authData.user.id);
-
-        if (updateError && !updateError.message.includes('duplicate') && !updateError.message.includes('does not exist')) {
-          console.warn('Warning: Could not update user profile:', updateError);
-          // Don't fail registration if profile update fails - trigger should have created it
-        }
       }
 
-      // No session = email confirmation required OR signup returned without session — try login
-      if (authData.user && !authData.session) {
-        console.log('No session after signup; attempting login...');
-        const loginResult = await signInWithPassword(supabase, normalizedEmail, password);
-        if (!loginResult.error && loginResult.data) {
-          return { data: loginResult.data, error: null, viaLogin: true };
-        }
+      // 3) New user with session (Confirm email OFF) → logged in
+      if (authData.session) {
+        return { data: authData, error: null, status: 'registered', isNewUser: true };
       }
 
-      return { data: authData, error: null };
+      // 4) New user, no session → try login (confirm email may be off but delayed)
+      const afterSignup = await tryLoginAndReturn(supabase, normalizedEmail, password);
+      if (afterSignup && !afterSignup.error) {
+        afterSignup.isNewUser = true;
+        afterSignup.status = 'registered';
+        return afterSignup;
+      }
+
+      if (afterSignup && afterSignup.needsEmailConfirm) {
+        return afterSignup;
+      }
+
+      return { data: authData, error: null, status: 'registered', isNewUser: true, needsEmailConfirm: true };
     } catch (error) {
       console.error('Registration error:', error);
       return { data: null, error };
