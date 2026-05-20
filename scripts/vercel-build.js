@@ -26,7 +26,7 @@ const SKIP_EXT = new Set(['.md', '.sql', '.zip', '.example']);
 
 function shouldCopy(name, isDir) {
   if (SKIP_DIRS.has(name)) return false;
-  if (isDir) return name === 'auth' || name === 'images';
+  if (isDir) return name === 'auth' || name === 'images' || name === 'public';
   if (SKIP_FILES.has(name)) return false;
   const ext = path.extname(name).toLowerCase();
   if (SKIP_EXT.has(ext)) return false;

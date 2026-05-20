@@ -47,11 +47,21 @@
 
         <form id="contactForm">
           <input type="text" id="contactName" placeholder="Your Name" required>
-          <input type="email" id="contactEmail" placeholder="Your Email" required>
+          <input type="email" id="contactEmail" placeholder="your@gmail.com" required>
           <input type="text" id="contactSubject" placeholder="Subject" required>
           <textarea id="contactMessage" placeholder="Message" rows="5" required></textarea>
           <button type="submit">Send Message</button>
         </form>
+
+        <div id="contactChatBox" style="display:none; margin-top:28px; background:rgba(255,255,255,0.95); border-radius:16px; padding:20px; box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+          <h3 style="margin:0 0 12px; color:#667eea;"><i class="fa-solid fa-comments"></i> Chat with JJRK Studio</h3>
+          <p style="margin:0 0 12px; font-size:13px; color:#6b7280;">Admin replies appear here in real time.</p>
+          <div id="contactChatMessages" style="max-height:280px; overflow-y:auto; padding:12px; background:#f9fafb; border-radius:12px; margin-bottom:12px;"></div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="contactChatInput" placeholder="Type a follow-up message..." style="flex:1; padding:10px 12px; border:1px solid #d1d5db; border-radius:10px;">
+            <button type="button" id="contactChatSend" style="padding:10px 18px; background:#667eea; color:#fff; border:none; border-radius:10px; font-weight:600; cursor:pointer;">Send</button>
+          </div>
+        </div>
         
         <style>
         .success-message {
@@ -136,71 +146,154 @@
           }, 4000);
         }
 
+        var contactThread = { id: null, token: null };
+        var contactPollTimer = null;
+
+        function renderContactChat(messages) {
+          var box = document.getElementById('contactChatMessages');
+          if (!box) return;
+          if (!messages || !messages.length) {
+            box.innerHTML = '<p style="color:#9ca3af;text-align:center;">Waiting for admin reply...</p>';
+            return;
+          }
+          box.innerHTML = messages.map(function(m) {
+            var isAdmin = m.sender_type === 'admin';
+            return '<div style="margin-bottom:10px;text-align:' + (isAdmin ? 'left' : 'right') + ';">' +
+              '<div style="display:inline-block;max-width:85%;padding:10px 14px;border-radius:12px;font-size:14px;' +
+              (isAdmin ? 'background:#667eea;color:#fff;' : 'background:#e5e7eb;color:#111;') + '">' +
+              (isAdmin ? '<strong>JJRK Studio</strong><br>' : '') + escapeHtml(m.body) +
+              '<div style="font-size:10px;opacity:0.8;margin-top:4px;">' + new Date(m.created_at).toLocaleString() + '</div></div></div>';
+          }).join('');
+          box.scrollTop = box.scrollHeight;
+        }
+
+        function escapeHtml(t) {
+          var d = document.createElement('div');
+          d.textContent = t || '';
+          return d.innerHTML;
+        }
+
+        async function refreshContactThread() {
+          if (!contactThread.id || !window.messaging) return;
+          var res = await window.messaging.getVisitorThread(contactThread.id, contactThread.token);
+          if (res.data && res.data.messages) {
+            renderContactChat(res.data.messages);
+          }
+        }
+
+        function startContactPolling() {
+          if (contactPollTimer) clearInterval(contactPollTimer);
+          contactPollTimer = setInterval(refreshContactThread, 3000);
+        }
+
+        async function openContactChat(id, token) {
+          contactThread.id = id;
+          contactThread.token = token;
+          localStorage.setItem('jjrk_contact_thread', JSON.stringify({ id: id, token: token }));
+          document.getElementById('contactChatBox').style.display = 'block';
+          await refreshContactThread();
+          startContactPolling();
+          if (window.messaging && window.messaging.subscribeVisitorRealtime) {
+            window.messaging.subscribeVisitorRealtime(id, function() { refreshContactThread(); });
+          }
+        }
+
+        document.getElementById('contactChatSend').addEventListener('click', async function() {
+          var input = document.getElementById('contactChatInput');
+          var body = (input.value || '').trim();
+          if (!body || !contactThread.id) return;
+          var res = await window.messaging.visitorSendMessage(contactThread.id, contactThread.token, body);
+          if (res.error) {
+            alert(res.error.message);
+            return;
+          }
+          input.value = '';
+          await refreshContactThread();
+        });
+
+        window.addEventListener('load', async function() {
+          await new Promise(function(r) { setTimeout(r, 400); });
+          var saved = localStorage.getItem('jjrk_contact_thread');
+          if (saved && window.messaging) {
+            try {
+              var t = JSON.parse(saved);
+              if (t.id && t.token) {
+                document.getElementById('contactChatBox').style.display = 'block';
+                await openContactChat(t.id, t.token);
+              }
+            } catch (e) { /* ignore */ }
+          }
+        });
+
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
           e.preventDefault();
-          
-          const name = document.getElementById('contactName').value;
-          const email = document.getElementById('contactEmail').value;
-          const subject = document.getElementById('contactSubject').value;
-          const message = document.getElementById('contactMessage').value;
 
-          // Show loading state
-          const submitBtn = this.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerHTML;
+          var name = document.getElementById('contactName').value.trim();
+          var email = document.getElementById('contactEmail').value.trim();
+          var subject = document.getElementById('contactSubject').value.trim();
+          var message = document.getElementById('contactMessage').value.trim();
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+          }
+
+          var submitBtn = this.querySelector('button[type="submit"]');
+          var originalText = submitBtn.innerHTML;
           submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
           submitBtn.disabled = true;
-          
-          // Save message to Supabase
+
           try {
-            if (!window.db || !window.db.createMessage) {
-              throw new Error('Database functions not loaded. Please refresh the page.');
+            if (!window.messaging) {
+              throw new Error('Messaging not loaded. Refresh the page.');
             }
 
-            const messageData = {
-              name: name,
-              email: email,
-              subject: subject,
-              message: message
-            };
+            var result = await window.messaging.createContactThread(name, email, subject, message);
 
-            const result = await window.db.createMessage(messageData);
+            if (result.error && window.db && window.db.createMessage) {
+              result = await window.db.createMessage({ name: name, email: email, subject: subject, message: message });
+              if (!result.error) {
+                showSuccessMessage('Message sent! (Run messaging-schema.sql in Supabase for live chat.)');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                return;
+              }
+            }
 
             if (result.error) {
-              showSuccessMessage('Message sending failed: ' + result.error.message);
+              showSuccessMessage('Failed: ' + result.error.message);
               submitBtn.innerHTML = originalText;
               submitBtn.disabled = false;
               return;
             }
 
-            // Show success message with better UI
-            showSuccessMessage('Message sent successfully! We will get back to you soon.');
-            this.reset();
+            var thread = result.data;
+            showSuccessMessage('Message sent! You can chat with us below.');
+            document.getElementById('contactMessage').value = '';
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-            
-            // Check if redirected from product booking (booking already created)
-            const urlParams = new URLSearchParams(window.location.search);
-            const product = urlParams.get('product');
-            if (product) {
-              setTimeout(() => {
-                showSuccessMessage('Your booking for ' + product + ' has been submitted! We will contact you soon.');
-              }, 2000);
+
+            if (thread && thread.conversation_id && thread.access_token) {
+              await openContactChat(thread.conversation_id, thread.access_token);
+            }
+
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('ref') === 'booking') {
+              showSuccessMessage('Your booking was submitted! We will reply here.');
             }
           } catch (error) {
             console.error('Message sending error:', error);
-            showSuccessMessage('An error occurred while sending your message. Please try again.');
+            showSuccessMessage('Error sending message. Please try again.');
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
           }
         });
         </script>
 
-        <!-- Supabase JS Library -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <!-- Supabase Configuration -->
         <script src="supabase-config.js"></script>
-        <!-- Database Utility Functions -->
         <script src="db.js"></script>
+        <script src="messaging.js"></script>
       </div>
     </section>
 
