@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJRK STUDIO - Home</title>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+<body class="dashboard-bg">
+
+  <!-- Navbar -->
+  <div id="header">
+    <div class="container">
+      <h1><a href="index.html" target="_self">JJRK STUDIO</a></h1>
+      <nav>
+        <ul>
+          <li><a href="index.html" target="_self" class="active">Home</a></li>
+          <li><a href="about_us.html" target="_self">About</a></li>
+          <li><a href="services.html" target="_self">Services</a></li>
+          <li><a href="product.html" target="_self">Offers</a></li>
+          <li><a href="contact_us.html" target="_self">Contact</a></li>
+        </ul>
+        <div class="auth-buttons">
+          <a href="login.html" class="btn-login">LOGIN</a>
+          <a href="register.html" class="btn-signup">SIGNUP</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <main>
+    <!-- HERO Section -->
+    <section id="hero">
+      <div class="hero-container">
+        <img src="images/jjrk.png" alt="JJRK logo" class="hero-logo">
+
+        <div class="hero-text">
+          <h1>Capturing Life's Special Moments</h1>
+          <h2>Professional Photography & Videography Services for Weddings, Events, and Special Occasions</h2>
+          <a class="btn-get" href="about_us.html" target="_self">Get Started</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Services -->
+    <section class="featured">
+      <div style="max-width:1000px;margin:0 auto">
+        <div style="text-align:center;margin-bottom:18px">
+          <h2 style="margin:0">Our Photography & Videography Services</h2>
+          <p style="color:#667eea; font-weight:500;">Professional multimedia services for all your special occasions</p>
+        </div>
+        <div class="grid">
+          <div class="card service-card" data-hover-image="images/wedding.jpg">
+            <div style="width:80px; height:80px; border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid #000; position:relative; z-index:20;">
+              <i class="fa-solid fa-camera" style="font-size:40px; color:#000;"></i>
+            </div>
+            <div class="title">Wedding Photography</div>
+            <p>Capture your special day with our professional wedding photography services.</p>
+            <a href="services.html" class="btn-get" style="margin-top:12px; display:inline-block; position:relative; z-index:20;">View Service</a>
+            <div class="hover-image" style="display:block; position:absolute; top:0; left:0; right:0; bottom:0; z-index:30; border-radius:20px; overflow:hidden; box-shadow:inset 0 0 0 2px rgba(102, 126, 234, 0.3); opacity:0; transition:opacity 0.3s ease; background:rgba(255,255,255,0.95); pointer-events:none;">
+              <img src="images/wedding.jpg" alt="Wedding" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </div>
+          </div>
+
+          <div class="card service-card" data-hover-image="images/event.jpg">
+            <div style="width:80px; height:80px; border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid #000; position:relative; z-index:20;">
+              <i class="fa-solid fa-video" style="font-size:40px; color:#000;"></i>
+            </div>
+            <div class="title">Event Videography</div>
+            <p>Professional videography services for weddings, birthdays, corporate events, and special celebrations.</p>
+            <a href="services.html" class="btn-get" style="margin-top:12px; display:inline-block; position:relative; z-index:20;">View Service</a>
+            <div class="hover-image" style="display:block; position:absolute; top:0; left:0; right:0; bottom:0; z-index:30; border-radius:20px; overflow:hidden; box-shadow:inset 0 0 0 2px rgba(102, 126, 234, 0.3); opacity:0; transition:opacity 0.3s ease; background:rgba(255,255,255,0.95); pointer-events:none;">
+              <img src="images/event.jpg" alt="Event" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </div>
+          </div>
+
+          <div class="card service-card" data-hover-image="images/Photo Booth.jpg">
+            <div style="width:80px; height:80px; border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid #000; position:relative; z-index:20;">
+              <i class="fa-solid fa-images" style="font-size:40px; color:#000;"></i>
+            </div>
+            <div class="title">Photo Booth Rental</div>
+            <p>Add fun and entertainment to your event with our professional photo booth rental service.</p>
+            <a href="services.html" class="btn-get" style="margin-top:12px; display:inline-block; position:relative; z-index:20;">View Service</a>
+            <div class="hover-image" style="display:block; position:absolute; top:0; left:0; right:0; bottom:0; z-index:30; border-radius:20px; overflow:hidden; box-shadow:inset 0 0 0 2px rgba(102, 126, 234, 0.3); opacity:0; transition:opacity 0.3s ease; background:rgba(255,255,255,0.95); pointer-events:none;">
+              <img src="images/Photo Booth.jpg" alt="Photo Booth" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="featured" style="background:#fff;">
+      <div style="max-width:1000px;margin:0 auto; padding:0 16px;">
+        <div style="text-align:center;margin-bottom:30px">
+          <h2 style="margin:0">Our Products</h2>
+          <p style="color:#667eea; font-weight:500;">Explore our photography and videography packages</p>
+        </div>
+        
+        <!-- Category: Wedding Packages -->
+        <div style="margin-bottom:30px;">
+          <h3 style="color:#667eea; border-bottom:2px solid #667eea; padding-bottom:8px; margin-bottom:20px;">Wedding Packages</h3>
+          <div class="grid">
+            <div class="card">
+              <img src="images/wedding.jpg" alt="Wedding Package" style="width:100%; height:180px; object-fit:cover; border-radius:6px; margin-bottom:12px;">
+              <div class="title">Wedding Package Basic</div>
+              <p>Essential photo & video coverage for your wedding day.</p>
+              <a href="product.html" class="btn-get" style="margin-top:12px; display:inline-block;">View Products</a>
+            </div>
+            <div class="card">
+              <img src="images/family portraits.png" alt="Wedding Package Premium" style="width:100%; height:180px; object-fit:cover; border-radius:6px; margin-bottom:12px;">
+              <div class="title">Wedding Package Premium</div>
+              <p>Comprehensive photo & video coverage with premium features.</p>
+              <a href="product.html" class="btn-get" style="margin-top:12px; display:inline-block;">View Products</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Event Packages -->
+        <div style="margin-bottom:30px;">
+          <h3 style="color:#667eea; border-bottom:2px solid #667eea; padding-bottom:8px; margin-bottom:20px;">Event Packages</h3>
+          <div class="grid">
+            <div class="card">
+              <img src="images/Event Coverage Standard.jpg" alt="Event Package" style="width:100%; height:180px; object-fit:cover; border-radius:6px; margin-bottom:12px;">
+              <div class="title">Event Coverage Standard</div>
+              <p>High-quality photography & videography for special occasions.</p>
+              <a href="product.html" class="btn-get" style="margin-top:12px; display:inline-block;">View Products</a>
+            </div>
+            <div class="card">
+              <img src="images/Event Coverage Premium.avif" alt="Event Package Premium" style="width:100%; height:180px; object-fit:cover; border-radius:6px; margin-bottom:12px;">
+              <div class="title">Event Coverage Premium</div>
+              <p>Premium event coverage with extended hours and multiple cameras.</p>
+              <a href="product.html" class="btn-get" style="margin-top:12px; display:inline-block;">View Products</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Photo Booth -->
+        <div style="margin-bottom:30px;">
+          <h3 style="color:#667eea; border-bottom:2px solid #667eea; padding-bottom:8px; margin-bottom:20px;">Photo Booth Rental</h3>
+          <div class="grid">
+            <div class="card">
+              <img src="images/Photo Booth.jpg" alt="Photo Booth" style="width:100%; height:180px; object-fit:cover; border-radius:6px; margin-bottom:12px;">
+              <div class="title">Photo Booth Basic</div>
+              <p>Fun and interactive photo booth setup for your parties.</p>
+              <a href="product.html" class="btn-get" style="margin-top:12px; display:inline-block;">View Products</a>
+            </div>
+            <div class="card">
+              <img src="images/Photo Booth Deluxe.jpg" alt="Photo Booth Deluxe" style="width:100%; height:180px; object-fit:cover; border-radius:6px; margin-bottom:12px;">
+              <div class="title">Photo Booth Deluxe</div>
+              <p>Premium photo booth with props and custom backgrounds.</p>
+              <a href="product.html" class="btn-get" style="margin-top:12px; display:inline-block;">View Products</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="padding:40px 20px; background:#f5f5f5; position:relative; color:#000000;">
+    <div style="text-align:center;">
+      <h3 style="color:#000000; margin:10px 0;">JJRK STUDIO</h3>
+      <p style="color:#000000; margin-bottom:25px;">Professional Photography & Videography Services</p>
+    </div>
+  
+    <p style="text-align:center; margin-top:20px; color:#000000;">&copy; <strong>JJRK STUDIO</strong>. All Rights Reserved</p>
+    
+    <!-- Social Media Icons - Centered at Bottom -->
+    <div class="social-links" style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:25px;">
+      <a href="https://www.facebook.com/profile.php?id=61579946364411&rdid=nj9z6stpJY6dPKt3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CeQP8tiQc#" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="Facebook">
+        <i class="fa-brands fa-facebook"></i>
+      </a>
+      <a href="https://www.instagram.com/jjrkstudio?igsh=MThxcGJ2bHA0emxyMw%3D%3D" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="Instagram">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/jjrk-studio-13b7b2399" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="LinkedIn">
+        <i class="fa-brands fa-linkedin"></i>
+      </a>
+      <a href="https://www.tiktok.com/@jjrkstudio?is_from_webapp=1&sender_device=pc" target="_blank" style="color:#667eea; text-decoration:none; font-size:20px;" title="TikTok">
+        <i class="fa-brands fa-tiktok"></i>
+      </a>
+      <a href="mailto:jjrkstudio@gmail.com" style="color:#667eea; text-decoration:none; font-size:20px;" title="Email">
+        <i class="fa-solid fa-envelope"></i>
+      </a>
+    </div>
+  </footer>
+  
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- JavaScript File -->
+  <script src="script.js"></script>
+  <!-- Navigation Authentication Handler -->
+  <script src="nav-auth.js"></script>
+  
+</body>
+</html>
+

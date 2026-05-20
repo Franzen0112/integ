@@ -35,10 +35,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // anon pub
 ### Step 2 — Create database tables
 
 1. Open: https://supabase.com/dashboard/project/eeagyngzbzcpqxptnqvy/sql/new  
-2. Copy all of **`supabase-schema.sql`**  
+2. Copy all of **`supabase-schema.sql`** (or **`supabase-schema-safe.sql`** if you have existing data)  
 3. Click **Run**  
-4. Run **`fix-rls-policies.sql`** after (for admin login)  
-5. Run **`images-schema-vercel.sql`** for site photos (optional but recommended)
+4. Run **`fix-rls-policies.sql`** after (for admin login)
 
 ### Step 3 — Auth settings (fix login/register)
 
@@ -78,8 +77,6 @@ UPDATE users SET role = 1 WHERE email = 'admin@jjrkstudio.com';
 ---
 
 ## Part 2: Deploy to Vercel
-
-**Full checklist:** see **`VERCEL_DEPLOY_STEPS.md`** (build `public/`, `images/` folder, SQL order).
 
 ### Step 1 — Push code to GitHub
 

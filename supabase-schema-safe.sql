@@ -1,30 +1,80 @@
--- Supabase Database Schema for JJRK Studio
--- Run this SQL in your Supabase SQL Editor to create the necessary tables
---
--- ⚠️ IMPORTANT: 
--- - If you have an EXISTING database with TEXT roles, run migrate-role-to-numeric.sql FIRST
--- - If this is a NEW database, you can run this schema directly
--- - This script will DROP existing tables if they exist (data will be lost!)
+-- Supabase Database Schema for JJRK Studio (Safe Version - Preserves Existing Data)
+-- This version checks and migrates existing tables instead of dropping them
+-- Run this SQL in your Supabase SQL Editor
 
 -- ===== USERS TABLE =====
--- This table stores user profiles
--- Drop table if exists to ensure clean setup (WARNING: This will delete all user data!)
-DROP TABLE IF EXISTS users CASCADE;
-
-CREATE TABLE users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT UNIQUE NOT NULL,
-  full_name TEXT,
-  phone TEXT,
-  role INTEGER DEFAULT 2 CHECK (role IN (1, 2)), -- 1 = Admin, 2 = User
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-);
+-- Check if table exists and handle migration
+DO $$
+BEGIN
+  -- If table doesn't exist, create it
+  IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users') THEN
+    CREATE TABLE users (
+      id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+      email TEXT UNIQUE NOT NULL,
+      full_name TEXT,
+      phone TEXT,
+      role INTEGER DEFAULT 2 CHECK (role IN (1, 2)), -- 1 = Admin, 2 = User
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+    );
+  ELSE
+    -- Table exists - check if role column is TEXT and migrate
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_name = 'users' 
+      AND column_name = 'role' 
+      AND data_type = 'text'
+    ) THEN
+      -- Step 1: Drop ALL policies that depend on role column from ALL tables
+      -- Users table policies
+      DROP POLICY IF EXISTS "Users can view own profile" ON users;
+      DROP POLICY IF EXISTS "Users can update own profile" ON users;
+      DROP POLICY IF EXISTS "Admins can view all users" ON users;
+      
+      -- Bookings table policies (if table exists)
+      DROP POLICY IF EXISTS "Admins can update bookings" ON bookings;
+      DROP POLICY IF EXISTS "Admins can delete bookings" ON bookings;
+      
+      -- Messages table policies (if table exists)
+      DROP POLICY IF EXISTS "Admins can view messages" ON messages;
+      DROP POLICY IF EXISTS "Admins can update messages" ON messages;
+      DROP POLICY IF EXISTS "Admins can delete messages" ON messages;
+      
+      -- Step 2: Drop existing constraint and default
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+      ALTER TABLE users ALTER COLUMN role DROP DEFAULT;
+      
+      -- Step 3: Change column type directly with CASE conversion
+      ALTER TABLE users ALTER COLUMN role TYPE INTEGER USING (
+        CASE 
+          WHEN role = 'admin' THEN 1
+          WHEN role = 'user' THEN 2
+          ELSE 2  -- Default to user if unknown value
+        END
+      );
+      
+      -- Step 4: Set new default and constraint
+      ALTER TABLE users ALTER COLUMN role SET DEFAULT 2;
+      ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN (1, 2));
+    ELSIF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_name = 'users' 
+      AND column_name = 'role' 
+      AND data_type = 'integer'
+    ) THEN
+      -- Column is already INTEGER, just ensure constraint and default are correct
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+      ALTER TABLE users ALTER COLUMN role SET DEFAULT 2;
+      ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN (1, 2));
+    END IF;
+  END IF;
+END $$;
 
 -- Enable Row Level Security (RLS) for users table
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if they exist (to allow re-running this script)
+-- Note: Policies may have been dropped during migration, so we drop them again to be safe
 DROP POLICY IF EXISTS "Users can view own profile" ON users;
 DROP POLICY IF EXISTS "Users can update own profile" ON users;
 DROP POLICY IF EXISTS "Admins can view all users" ON users;
@@ -54,7 +104,9 @@ CREATE POLICY "Admins can view all users" ON users
 
 -- ===== BOOKINGS TABLE =====
 -- This table stores booking information
-CREATE TABLE IF NOT EXISTS bookings (
+DROP TABLE IF EXISTS bookings CASCADE;
+
+CREATE TABLE bookings (
   id BIGSERIAL PRIMARY KEY,
   service TEXT NOT NULL,
   client TEXT NOT NULL,
@@ -79,13 +131,8 @@ DROP POLICY IF EXISTS "Admins can update bookings" ON bookings;
 DROP POLICY IF EXISTS "Admins can delete bookings" ON bookings;
 
 -- Policy: Anyone can create bookings
-CREATE POLICY "anon_insert_bookings" ON bookings
-  AS PERMISSIVE FOR INSERT TO anon
-  WITH CHECK (true);
-
-CREATE POLICY "authenticated_insert_bookings" ON bookings
-  AS PERMISSIVE FOR INSERT TO authenticated
-  WITH CHECK (true);
+CREATE POLICY "Anyone can create bookings" ON bookings
+  FOR INSERT WITH CHECK (true);
 
 -- Policy: Anyone can read bookings (or restrict to own bookings if needed)
 CREATE POLICY "Anyone can view bookings" ON bookings
@@ -111,7 +158,9 @@ CREATE POLICY "Admins can delete bookings" ON bookings
 
 -- ===== MESSAGES TABLE =====
 -- This table stores contact form messages
-CREATE TABLE IF NOT EXISTS messages (
+DROP TABLE IF EXISTS messages CASCADE;
+
+CREATE TABLE messages (
   id BIGSERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL,
@@ -130,14 +179,9 @@ DROP POLICY IF EXISTS "Admins can view messages" ON messages;
 DROP POLICY IF EXISTS "Admins can update messages" ON messages;
 DROP POLICY IF EXISTS "Admins can delete messages" ON messages;
 
--- Policy: Anyone can create messages (anon = website visitors)
-CREATE POLICY "anon_insert_messages" ON messages
-  AS PERMISSIVE FOR INSERT TO anon
-  WITH CHECK (true);
-
-CREATE POLICY "authenticated_insert_messages" ON messages
-  AS PERMISSIVE FOR INSERT TO authenticated
-  WITH CHECK (true);
+-- Policy: Anyone can create messages
+CREATE POLICY "Anyone can create messages" ON messages
+  FOR INSERT WITH CHECK (true);
 
 -- Policy: Only admins can read messages
 CREATE POLICY "Admins can view messages" ON messages

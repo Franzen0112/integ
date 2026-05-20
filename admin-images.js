@@ -68,7 +68,7 @@
     var res = await window.siteImages.uploadAndSaveImage(slug, file);
     if (res.error) {
       statusEl(card, res.error.message || 'Upload failed', 'error');
-      alert('Upload failed:\n' + (res.error.message || 'Check you are logged in as admin and ran images-schema-vercel.sql'));
+      alert('Upload failed:\n' + (res.error.message || 'Check you are logged in as admin and ran images-schema.sql'));
       return;
     }
 
@@ -98,7 +98,7 @@
       var note = document.createElement('p');
       note.className = 'admin-img-error';
       note.style.gridColumn = '1 / -1';
-      note.innerHTML = 'Database optional — showing local <strong>images/</strong> folder. Run <strong>images-schema-vercel.sql</strong> for cloud upload. ' +
+      note.innerHTML = 'Database optional — showing local <strong>images/</strong> folder. Run <strong>images-schema.sql</strong> for cloud upload. ' +
         (res.error.message ? '(' + window.siteImages.escapeHtml(res.error.message) + ')' : '');
       grid.appendChild(note);
     }

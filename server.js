@@ -54,7 +54,7 @@ function sendFile(res, filePath) {
 }
 
 const server = http.createServer((req, res) => {
-  let urlPath = req.url === '/' ? '/dashboard.html' : req.url;
+  let urlPath = req.url === '/' ? '/index.html' : req.url;
   let filePath = safePath(urlPath);
 
   if (!filePath) {
@@ -65,12 +65,12 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (!err && stats.isDirectory()) {
-      filePath = path.join(filePath, 'dashboard.html');
+      filePath = path.join(filePath, 'index.html');
     }
 
     if (err) {
       if (urlPath.endsWith('/') || !path.extname(urlPath)) {
-        const htmlFallback = safePath(urlPath + (urlPath.endsWith('/') ? '' : '/') + 'dashboard.html') ||
+        const htmlFallback = safePath(urlPath + (urlPath.endsWith('/') ? '' : '/') + 'index.html') ||
           safePath(urlPath.replace(/\/?$/, '.html'));
         if (htmlFallback && fs.existsSync(htmlFallback)) {
           sendFile(res, htmlFallback);
@@ -91,7 +91,7 @@ server.listen(PORT, HOST, () => {
   console.log('');
   console.log('  JJRK Studio — local dev server');
   console.log('  ------------------------------');
-  console.log(`  Home:    ${base}/dashboard.html`);
+  console.log(`  Home:    ${base}/index.html`);
   console.log(`  Login:   ${base}/login.html`);
   console.log(`  Register:${base}/register.html`);
   console.log('');

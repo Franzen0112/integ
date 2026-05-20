@@ -38,12 +38,24 @@
     }
   }
 
+  /** Check Supabase session only — does not log in or redirect (use on login/register page load). */
+  async function getPersistedUser() {
+    try {
+      await ensureAuthReady();
+      var result = await window.db.getCurrentUser();
+      return result.user || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   if (typeof window !== 'undefined') {
     window.authCommon = {
       isValidEmail: isValidEmail,
       ensureAuthReady: ensureAuthReady,
       finishLoggedIn: finishLoggedIn,
-      redirectAfterAuth: redirectAfterAuth
+      redirectAfterAuth: redirectAfterAuth,
+      getPersistedUser: getPersistedUser
     };
   }
 })();

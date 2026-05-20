@@ -43,5 +43,5 @@ Until you upload, pages use fallback images in `images/` folder or initials (tea
 
 ## Troubleshooting
 
-- **Upload failed** — Confirm admin login (Supabase session), run `images-schema-vercel.sql`, check Storage bucket `jjrk-images` exists.
+- **Upload failed** — Confirm admin login (Supabase session), run `images-schema.sql`, check Storage bucket `jjrk-images` exists.
 - **Photos not showing on site** — Hard refresh (`Ctrl+F5`); check `site_images.image_url` in Supabase Table Editor.
