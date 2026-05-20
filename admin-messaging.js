@@ -114,10 +114,18 @@
 
     box.innerHTML = messages.map(function(m) {
       var isAdmin = m.sender_type === 'admin';
+      var rowClass = isAdmin ? 'admin' : 'visitor';
+      var meta = isAdmin
+        ? escapeHtml(m.sender_name) + ' · ' + window.messaging.formatTime(m.created_at)
+        : escapeHtml(m.sender_name) + ' · ' + window.messaging.formatTime(m.created_at);
+      var badge = isAdmin ? '' : '<span class="user-badge"><i class="fa-solid fa-user"></i> Customer message</span>';
       return (
-        '<div class="chat-bubble ' + (isAdmin ? 'admin' : 'visitor') + '">' +
-          '<div class="chat-meta">' + escapeHtml(m.sender_name) + ' · ' + window.messaging.formatTime(m.created_at) + '</div>' +
-          '<div class="chat-body">' + escapeHtml(m.body) + '</div>' +
+        '<div class="chat-row ' + rowClass + '">' +
+          '<div class="chat-bubble ' + rowClass + '">' +
+            badge +
+            '<div class="chat-meta">' + meta + '</div>' +
+            '<div class="chat-body">' + escapeHtml(m.body) + '</div>' +
+          '</div>' +
         '</div>'
       );
     }).join('');
