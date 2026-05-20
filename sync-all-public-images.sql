@@ -9,10 +9,10 @@ ON CONFLICT (slug) DO UPDATE SET
   is_active = TRUE,
   updated_at = TIMEZONE('utc', NOW());
 
-UPDATE public.site_images SET fallback_path = 'images/Rovick Polinar.png' WHERE slug = 'team_ronie' AND fallback_path IS NULL;
-UPDATE public.site_images SET fallback_path = 'images/Christian Kirt Basog.jpg' WHERE slug = 'team_kim' AND fallback_path IS NULL;
-UPDATE public.site_images SET fallback_path = 'images/Jhon Vaneth Mejos.jpg' WHERE slug = 'team_drowmar' AND fallback_path IS NULL;
-UPDATE public.site_images SET fallback_path = 'images/Jason S. Salim.jpg' WHERE slug = 'team_franzen' AND fallback_path IS NULL;
-UPDATE public.site_images SET fallback_path = 'images/Video Editing.webp' WHERE slug = 'team_dec' AND fallback_path IS NULL;
+UPDATE public.site_images SET fallback_path = 'images/Ronie Manaongsong.jpg' WHERE slug = 'team_ronie';
+UPDATE public.site_images SET fallback_path = NULL WHERE slug = 'team_kim';
+UPDATE public.site_images SET fallback_path = 'images/Drowmar Vinculado.jpg' WHERE slug = 'team_drowmar';
+UPDATE public.site_images SET fallback_path = 'images/Franzen Libradilla.jpg' WHERE slug = 'team_franzen';
+UPDATE public.site_images SET fallback_path = 'images/Dec Rainiel Bucong.jpg' WHERE slug = 'team_dec';
 
 SELECT slug, fallback_path FROM public.site_images ORDER BY sort_order;
