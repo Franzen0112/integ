@@ -398,10 +398,6 @@
         return;
       }
 
-      if (await window.authCommon.tryRestoreSession()) {
-        return;
-      }
-
       const form = document.getElementById('registerForm');
       const submitBtn = form.querySelector('.register-button span');
 

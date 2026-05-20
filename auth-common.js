@@ -38,18 +38,15 @@
     }
   }
 
-  async function tryRestoreSession() {
+  /** Check Supabase session only — does not log in or redirect (use on login/register page load). */
+  async function getPersistedUser() {
     try {
       await ensureAuthReady();
       var result = await window.db.getCurrentUser();
-      if (result.user) {
-        await redirectAfterAuth(result.user, result.user.email);
-        return true;
-      }
+      return result.user || null;
     } catch (e) {
-      console.warn('Session restore skipped:', e.message);
+      return null;
     }
-    return false;
   }
 
   if (typeof window !== 'undefined') {
@@ -58,7 +55,7 @@
       ensureAuthReady: ensureAuthReady,
       finishLoggedIn: finishLoggedIn,
       redirectAfterAuth: redirectAfterAuth,
-      tryRestoreSession: tryRestoreSession
+      getPersistedUser: getPersistedUser
     };
   }
 })();
