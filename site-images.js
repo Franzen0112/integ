@@ -64,6 +64,9 @@
       fallback_path: 'images/jjrk.png' },
     { slug: 'media_camera', category: 'studio', title: 'Camera Background', subtitle: null,
       description: 'Login and register page background.', sort_order: 51,
+      fallback_path: 'images/camera.jpg' },
+    { slug: 'dashboard_bg', category: 'studio', title: 'Dashboard Background', subtitle: null,
+      description: 'Home dashboard background.', sort_order: 52,
       fallback_path: 'images/camera.jpg' }
   ];
 
@@ -179,27 +182,43 @@
     }).eq('slug', slug).select().single();
   }
 
+  function buildLocalBySlug() {
+    var bySlug = {};
+    PUBLIC_IMAGE_CATALOG.forEach(function(row) {
+      bySlug[row.slug] = Object.assign({}, row);
+    });
+    return bySlug;
+  }
+
   function applyImageToElement(el, record) {
     if (!el || !record) return;
-    var url = resolveImageUrl(record);
-    if (!url) return;
-    var fb = el.getAttribute('data-fallback-src') || el.getAttribute('src');
-    if (fb) el.setAttribute('data-fallback-src', fb);
-    el.src = url;
-    if (record.title) el.alt = record.title;
+    var local = getLocalFallback(record.slug, record);
+    var fb = el.getAttribute('data-fallback-src') || el.getAttribute('src') || local;
+    if (fb && !el.getAttribute('data-fallback-src')) {
+      el.setAttribute('data-fallback-src', fb);
+    }
+    if (record.image_url) {
+      el.src = record.image_url;
+    } else if (local && (!el.getAttribute('src') || el.getAttribute('src').indexOf('http') === 0)) {
+      el.src = local;
+    }
+    if (record.title && !el.getAttribute('alt')) el.alt = record.title;
     el.onerror = function() {
       if (fb && el.src !== fb) el.src = fb;
     };
   }
 
   function applyBackgroundImages(bySlug) {
+    bySlug = bySlug || buildLocalBySlug();
     document.querySelectorAll('[data-image-bg]').forEach(function(el) {
       var slug = el.getAttribute('data-image-bg');
       var rec = recordForSlug(slug, bySlug);
       var url = resolveImageUrl(rec);
-      if (url) {
-        el.style.backgroundImage = "url('" + url.replace(/'/g, '%27') + "')";
-      }
+      if (!url) return;
+      el.style.backgroundImage = "url('" + url.replace(/'/g, '%27') + "')";
+      el.style.backgroundSize = el.style.backgroundSize || 'cover';
+      el.style.backgroundPosition = el.style.backgroundPosition || 'center';
+      el.style.backgroundRepeat = el.style.backgroundRepeat || 'no-repeat';
     });
   }
 
@@ -217,18 +236,32 @@
     });
   }
 
-  async function loadImagesIntoPage() {
-    var nodes = document.querySelectorAll('[data-image-slug]');
-    if (!nodes.length) return;
-
-    var res = await getImagesByCategory(null);
-    var bySlug = {};
-    (res.data || []).forEach(function(row) { bySlug[row.slug] = row; });
-
-    nodes.forEach(function(el) {
+  function applyAllLocalImagesNow() {
+    var bySlug = buildLocalBySlug();
+    document.querySelectorAll('[data-image-slug]').forEach(function(el) {
       var slug = el.getAttribute('data-image-slug');
       applyImageToElement(el, recordForSlug(slug, bySlug));
     });
+    applyBackgroundImages(bySlug);
+    applyHoverImageSlugs(bySlug);
+  }
+
+  async function loadImagesIntoPage() {
+    applyAllLocalImagesNow();
+    try {
+      var res = await getImagesByCategory(null);
+      var bySlug = {};
+      (res.data || []).forEach(function(row) { bySlug[row.slug] = row; });
+      document.querySelectorAll('[data-image-slug]').forEach(function(el) {
+        var slug = el.getAttribute('data-image-slug');
+        var rec = recordForSlug(slug, bySlug);
+        if (rec && rec.image_url) applyImageToElement(el, rec);
+      });
+      applyBackgroundImages(bySlug);
+      applyHoverImageSlugs(bySlug);
+    } catch (e) {
+      console.warn('Cloud images skipped:', e.message || e);
+    }
   }
 
   function renderTeamCard(member) {
@@ -245,12 +278,17 @@
       '<p class="team-bio">' + escapeHtml(member.description || '') + '</p></div>';
   }
 
-  async function renderTeamSection(containerId) {
+  async function renderTeamSection(containerId, forceReplace) {
     var container = document.getElementById(containerId);
     if (!container) return;
+    if (!forceReplace && container.querySelector('img.team-photo')) {
+      applyAllLocalImagesNow();
+      return;
+    }
     var res = await getImagesByCategory('team');
     var team = (res.data || []).filter(function(r) { return r.category === 'team'; });
     container.innerHTML = team.map(renderTeamCard).join('');
+    applyAllLocalImagesNow();
   }
 
   async function ensureSupabaseReady() {
@@ -258,23 +296,29 @@
     else if (typeof window.initializeSupabaseClient === 'function') window.initializeSupabaseClient();
   }
 
-  /** Call on every page — loads all public images by slug */
+  /** Local images first (instant), then optional Supabase upgrade */
   async function initPublicImagesOnPage() {
+    applyAllLocalImagesNow();
     try {
       await ensureSupabaseReady();
+      await loadImagesIntoPage();
     } catch (e) {
-      console.warn('Supabase optional for images:', e.message);
+      console.warn('Supabase optional for images:', e.message || e);
     }
-    var res = await getImagesByCategory(null);
-    var bySlug = {};
-    (res.data || []).forEach(function(row) { bySlug[row.slug] = row; });
-
-    await loadImagesIntoPage();
-    applyBackgroundImages(bySlug);
-    applyHoverImageSlugs(bySlug);
-
     if (typeof window.dispatchEvent === 'function') {
       window.dispatchEvent(new CustomEvent('jjrk-images-ready', { detail: { count: PUBLIC_IMAGE_CATALOG.length } }));
+    }
+  }
+
+  function bootLocalImages() {
+    applyAllLocalImagesNow();
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootLocalImages);
+    } else {
+      bootLocalImages();
     }
   }
 
@@ -290,6 +334,7 @@
     getAllImagesAdmin: getAllImagesAdmin,
     getImageBySlug: getImageBySlug,
     uploadAndSaveImage: uploadAndSaveImage,
+    applyAllLocalImagesNow: applyAllLocalImagesNow,
     loadImagesIntoPage: loadImagesIntoPage,
     renderTeamSection: renderTeamSection,
     initPublicImagesOnPage: initPublicImagesOnPage,

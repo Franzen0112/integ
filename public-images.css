@@ -1,0 +1,33 @@
+/**
+ * Public image paths — load from CSS immediately (no refresh / no wait for JS)
+ */
+
+/* Login & register background */
+body.auth-page-bg,
+body[data-image-bg="media_camera"] {
+  background-image: url('images/camera.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Dashboard / home page background */
+body.dashboard-bg,
+body[data-image-bg="dashboard_bg"] {
+  background-image: url('images/camera.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Team photos — visible immediately when HTML has src */
+.team-card .team-photo {
+  display: block;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 18px;
+  border: 4px solid #667eea;
+}

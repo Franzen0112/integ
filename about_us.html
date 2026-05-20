@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JJRK STUDIO - About Us</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="public-images.css">
+  <link rel="preload" as="image" href="images/Ronie Manaongsong.jpg">
+  <link rel="preload" as="image" href="images/Drowmar Vinculado.jpg">
+  <link rel="preload" as="image" href="images/Franzen Libradilla.jpg">
+  <link rel="preload" as="image" href="images/Dec Rainiel Bucong.jpg">
+  <script src="site-images.js" defer></script>
 </head>
 <body>
 
@@ -65,7 +71,7 @@
         <h2 style="text-align:center; margin-bottom:40px; color:#000000; font-weight:bold;">Our Team</h2>
         <div class="team-grid" id="team-grid">
           <div class="team-card">
-            <img src="images/Ronie Manaongsong.jpg" data-image-slug="team_ronie" alt="Ronie Manaongsong" class="team-photo" loading="lazy">
+            <img src="images/Ronie Manaongsong.jpg" data-image-slug="team_ronie" alt="Ronie Manaongsong" class="team-photo" fetchpriority="high" decoding="async">
             <h3>Ronie Manaongsong</h3><p class="team-role">CEO &amp; Founder</p><p class="team-bio">Ronie leads JJRK Studio with vision and client-focused leadership.</p>
           </div>
           <div class="team-card">
@@ -73,15 +79,15 @@
             <h3>Kim Duenas</h3><p class="team-role">Lead Photographer</p><p class="team-bio">Kim captures authentic moments with sharp composition and natural light.</p>
           </div>
           <div class="team-card">
-            <img src="images/Drowmar Vinculado.jpg" data-image-slug="team_drowmar" alt="Drowmar Vincullado" class="team-photo" loading="lazy">
+            <img src="images/Drowmar Vinculado.jpg" data-image-slug="team_drowmar" alt="Drowmar Vincullado" class="team-photo" fetchpriority="high" decoding="async">
             <h3>Drowmar Vincullado</h3><p class="team-role">Lead Videographer</p><p class="team-bio">Drowmar creates cinematic stories for weddings and events.</p>
           </div>
           <div class="team-card">
-            <img src="images/Franzen Libradilla.jpg" data-image-slug="team_franzen" alt="Franzen Libradilla" class="team-photo" loading="lazy">
+            <img src="images/Franzen Libradilla.jpg" data-image-slug="team_franzen" alt="Franzen Libradilla" class="team-photo" fetchpriority="high" decoding="async">
             <h3>Franzen Libradilla</h3><p class="team-role">Media &amp; Web Specialist</p><p class="team-bio">Franzen manages the studio website and digital experience.</p>
           </div>
           <div class="team-card">
-            <img src="images/Dec Rainiel Bucong.jpg" data-image-slug="team_dec" alt="Dec Bucong" class="team-photo" loading="lazy">
+            <img src="images/Dec Rainiel Bucong.jpg" data-image-slug="team_dec" alt="Dec Bucong" class="team-photo" fetchpriority="high" decoding="async">
             <h3>Dec Bucong</h3><p class="team-role">Senior Photo &amp; Video Editor</p><p class="team-bio">Dec delivers polished photos and videos through expert editing.</p>
           </div>
         </div>
@@ -123,15 +129,7 @@
   <script src="nav-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="site-images.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      if (window.siteImages) {
-        await window.siteImages.initPublicImagesOnPage();
-        await window.siteImages.renderTeamSection('team-grid');
-      }
-    });
-  </script>
+  <script src="site-images-loader.js"></script>
 
 </body>
 </html>
