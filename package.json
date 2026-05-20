@@ -5,6 +5,7 @@
   "description": "JJRK Studio — local dev server for Supabase auth testing in Chrome",
   "scripts": {
     "build": "node scripts/vercel-build.js",
+    "extract-images": "node scripts/extract-images.js",
     "start": "node server.js",
     "dev": "node server.js"
   }

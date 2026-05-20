@@ -19,8 +19,10 @@
   }
 
   function previewHtml(record) {
-    if (record.image_url) {
-      return '<img src="' + window.siteImages.escapeHtml(record.image_url) + '" alt="" class="admin-img-preview">';
+    var url = window.siteImages.resolveImageUrl(record);
+    if (url) {
+      return '<img src="' + window.siteImages.escapeHtml(url) + '" alt="" class="admin-img-preview" onerror="this.outerHTML=\'<div class=admin-img-placeholder>' +
+        window.siteImages.escapeHtml(window.siteImages.initialsFromTitle(record.title)) + '</div>\'">';
     }
     var initials = window.siteImages.initialsFromTitle(record.title);
     return '<div class="admin-img-placeholder">' + window.siteImages.escapeHtml(initials) + '</div>';
@@ -89,13 +91,19 @@
     await window.siteImages.ensureSupabaseReady();
 
     var res = await window.siteImages.getAllImagesAdmin();
-    if (res.error) {
-      grid.innerHTML = '<p class="admin-img-error">Could not load images. Run <strong>images-schema.sql</strong> in Supabase.</p>';
-      return;
-    }
+    var list = (res.data && res.data.length) ? res.data : window.siteImages.FALLBACK_CATALOG;
 
     grid.innerHTML = '';
-    (res.data || []).forEach(function(record) {
+    if (res.error) {
+      var note = document.createElement('p');
+      note.className = 'admin-img-error';
+      note.style.gridColumn = '1 / -1';
+      note.innerHTML = 'Database optional — showing local <strong>images/</strong> folder. Run <strong>images-schema.sql</strong> for cloud upload. ' +
+        (res.error.message ? '(' + window.siteImages.escapeHtml(res.error.message) + ')' : '');
+      grid.appendChild(note);
+    }
+
+    list.forEach(function(record) {
       grid.appendChild(buildCard(record));
     });
   }

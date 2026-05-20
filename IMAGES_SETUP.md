@@ -1,6 +1,17 @@
-# Site Images (Database + Auto-Save)
+# Site Images (Local extract + optional Database)
 
-## 1. Run SQL in Supabase
+## 0. Extract photos (required for dashboard / home)
+
+Zip file should be in project root: `images-20260520T124118Z-3-001.zip`
+
+```powershell
+cd c:\Users\FRANZEN\Downloads\integ
+node scripts/extract-images.js
+```
+
+This creates **`images/`** with `wedding.jpg`, `jjrk.png`, etc. Pages use these paths first; database upload is optional.
+
+## 1. Run SQL in Supabase (optional — for admin upload)
 
 Open **SQL Editor** and run (after `supabase-schema.sql` + `fix-rls-policies.sql`):
 
