@@ -24,7 +24,7 @@ npm start
 
 Then open Chrome:
 
-- Home: http://127.0.0.1:8080/index.html
+- Home: http://127.0.0.1:8080/dashboard.html
 - Login: http://127.0.0.1:8080/login.html
 - Register: http://127.0.0.1:8080/register.html
 

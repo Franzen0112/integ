@@ -581,73 +581,6 @@
     }
   }
 
-  /**
-   * Get all messages
-   * @returns {Promise<Array>} - Array of messages
-   */
-  async function getAllMessages() {
-    try {
-      const supabase = getSupabaseClient();
-      if (!supabase) return { data: null, error: new Error('Supabase client not initialized') };
-      
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      return { data, error };
-    } catch (error) {
-      console.error('Get messages error:', error);
-      return { data: null, error };
-    }
-  }
-
-  /**
-   * Mark message as read
-   * @param {number} messageId - Message ID
-   * @returns {Promise<Object>} - Updated message
-   */
-  async function markMessageAsRead(messageId) {
-    try {
-      const supabase = getSupabaseClient();
-      if (!supabase) return { data: null, error: new Error('Supabase client not initialized') };
-      
-      const { data, error } = await supabase
-        .from('messages')
-        .update({ read: true })
-        .eq('id', messageId)
-        .select()
-        .single();
-
-      return { data, error };
-    } catch (error) {
-      console.error('Mark message as read error:', error);
-      return { data: null, error };
-    }
-  }
-
-  /**
-   * Delete a message
-   * @param {number} messageId - Message ID
-   * @returns {Promise<Object>} - Delete result
-   */
-  async function deleteMessage(messageId) {
-    try {
-      const supabase = getSupabaseClient();
-      if (!supabase) return { error: new Error('Supabase client not initialized') };
-      
-      const { error } = await supabase
-        .from('messages')
-        .delete()
-        .eq('id', messageId);
-
-      return { error };
-    } catch (error) {
-      console.error('Delete message error:', error);
-      return { error };
-    }
-  }
-
   // Export functions for use in other files
   if (typeof window !== 'undefined') {
     window.db = {
@@ -661,10 +594,7 @@
       getAllBookings,
       updateBookingStatus,
       deleteBooking,
-      createMessage,
-      getAllMessages,
-      markMessageAsRead,
-      deleteMessage
+      createMessage
     };
   }
 })();

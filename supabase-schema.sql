@@ -1,10 +1,8 @@
 -- Supabase Database Schema for JJRK Studio
 -- Run this SQL in your Supabase SQL Editor to create the necessary tables
 --
--- ⚠️ IMPORTANT: 
--- - If you have an EXISTING database with TEXT roles, run migrate-role-to-numeric.sql FIRST
--- - If this is a NEW database, you can run this schema directly
--- - This script will DROP existing tables if they exist (data will be lost!)
+-- ⚠️ IMPORTANT: New database only — DROP existing tables (data will be lost!)
+-- Run order: this file → fix-rls-policies.sql → messaging (optional) → images-schema-vercel.sql
 
 -- ===== USERS TABLE =====
 -- This table stores user profiles

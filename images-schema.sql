@@ -1,5 +1,0 @@
--- JJRK Studio — Site Images
--- USE THIS FILE ON SUPABASE + VERCEL: images-schema-vercel.sql
---
--- Copy/paste and run: images-schema-vercel.sql
--- (Complete, safe to re-run, includes Vercel fallback paths + Storage bucket)
