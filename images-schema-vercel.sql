@@ -110,7 +110,7 @@ INSERT INTO public.site_images (slug, category, title, subtitle, description, fa
   ('team_ronie', 'team', 'Ronie Manaongsong', 'CEO & Founder',
    'Ronie leads JJRK Studio with vision and client-focused leadership.', 'images/Ronie Manaongsong.jpg', 1),
   ('team_kim', 'team', 'Kim Duenas', 'Lead Photographer',
-   'Kim captures authentic moments with sharp composition and natural light.', NULL, 2),
+   'Kim captures authentic moments with sharp composition and natural light.', 'images/Kim Duenas.jpg', 2),
   ('team_drowmar', 'team', 'Drowmar Vincullado', 'Lead Videographer',
    'Drowmar creates cinematic stories for weddings and events.', 'images/Drowmar Vinculado.jpg', 3),
   ('team_franzen', 'team', 'Franzen Libradilla', 'Media & Web Specialist',

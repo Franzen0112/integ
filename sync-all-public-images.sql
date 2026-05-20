@@ -10,7 +10,7 @@ ON CONFLICT (slug) DO UPDATE SET
   updated_at = TIMEZONE('utc', NOW());
 
 UPDATE public.site_images SET fallback_path = 'images/Ronie Manaongsong.jpg' WHERE slug = 'team_ronie';
-UPDATE public.site_images SET fallback_path = NULL WHERE slug = 'team_kim';
+UPDATE public.site_images SET fallback_path = 'images/Kim Duenas.jpg' WHERE slug = 'team_kim';
 UPDATE public.site_images SET fallback_path = 'images/Drowmar Vinculado.jpg' WHERE slug = 'team_drowmar';
 UPDATE public.site_images SET fallback_path = 'images/Franzen Libradilla.jpg' WHERE slug = 'team_franzen';
 UPDATE public.site_images SET fallback_path = 'images/Dec Rainiel Bucong.jpg' WHERE slug = 'team_dec';

@@ -13,7 +13,7 @@
       fallback_path: 'images/Ronie Manaongsong.jpg' },
     { slug: 'team_kim', category: 'team', title: 'Kim Duenas', subtitle: 'Lead Photographer',
       description: 'Kim captures authentic moments with sharp composition and natural light.', sort_order: 2,
-      fallback_path: null },
+      fallback_path: 'images/Kim Duenas.jpg' },
     { slug: 'team_drowmar', category: 'team', title: 'Drowmar Vincullado', subtitle: 'Lead Videographer',
       description: 'Drowmar creates cinematic stories for weddings and events.', sort_order: 3,
       fallback_path: 'images/Drowmar Vinculado.jpg' },
