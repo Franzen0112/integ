@@ -10,6 +10,9 @@ Thumbs.db
 !.vscode/launch.json
 !.vscode/tasks.json
 
+# Vercel build output
+public/
+
 # Archives (extract images/ instead of committing zips)
 *.zip
 

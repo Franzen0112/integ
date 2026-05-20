@@ -43,8 +43,8 @@ After adding env vars:
 | Setting | Value |
 |---------|-------|
 | **Build Command** | `npm run build` |
-| **Output Directory** | `.` (root) or leave empty |
-| **Install Command** | `npm install` (optional, no deps required) |
+| **Output Directory** | `public` |
+| **Install Command** | leave empty (optional) |
 
 `npm run build` runs `scripts/generate-supabase-config.js` and writes `supabase-config.js` using the variables above.
 
