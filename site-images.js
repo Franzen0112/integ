@@ -57,14 +57,15 @@
     return window.supabaseClient || null;
   }
 
-  function getLocalFallback(slug) {
+  function getLocalFallback(slug, record) {
+    if (record && record.fallback_path) return record.fallback_path;
     return IMAGE_FALLBACKS[slug] || null;
   }
 
   function resolveImageUrl(record) {
     if (!record) return null;
     if (record.image_url) return record.image_url;
-    return getLocalFallback(record.slug) || record.local_fallback || null;
+    return getLocalFallback(record.slug, record) || record.local_fallback || null;
   }
 
   function mergeWithFallbacks(rows) {
@@ -74,12 +75,12 @@
       var row = bySlug[base.slug];
       if (!row) {
         return Object.assign({}, base, {
-          local_fallback: getLocalFallback(base.slug),
+          local_fallback: getLocalFallback(base.slug, base),
           image_url: null
         });
       }
       return Object.assign({}, base, row, {
-        local_fallback: getLocalFallback(row.slug)
+        local_fallback: getLocalFallback(row.slug, row)
       });
     });
   }

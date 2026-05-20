@@ -11,13 +11,13 @@ node scripts/extract-images.js
 
 This creates **`images/`** with `wedding.jpg`, `jjrk.png`, etc. Pages use these paths first; database upload is optional.
 
-## 1. Run SQL in Supabase (optional — for admin upload)
+## 1. Run SQL in Supabase (Vercel + admin upload)
 
-Open **SQL Editor** and run (after `supabase-schema.sql` + `fix-rls-policies.sql`):
+Open **SQL Editor** → New query → paste **`images-schema-vercel.sql`** → Run
 
-```
-images-schema.sql
-```
+(After `supabase-schema.sql` + `fix-rls-policies.sql`. Safe to re-run.)
+
+This creates `site_images`, Storage bucket `jjrk-images`, and `fallback_path` for Vercel static files.
 
 This creates:
 
